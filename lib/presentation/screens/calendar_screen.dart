@@ -2,79 +2,577 @@ import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
+import 'package:coco_app/domain/models/scheduled_post_model.dart';
+import 'package:coco_app/data/services/post_storage_service.dart';
+import 'package:coco_app/core/widgets/add_post_dialog.dart';
 
-// Calendar screen WITH navbar (used in bottom nav)
-class CalendarScreenWithNavbar extends StatelessWidget {
+import '../../core/widgets/add_post_dialog.dart';
+
+class CalendarScreenWithNavbar extends StatefulWidget {
   const CalendarScreenWithNavbar({super.key});
 
   @override
+  State<CalendarScreenWithNavbar> createState() => _CalendarScreenWithNavbarState();
+}
+
+class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
+  final PostStorageService _storageService = PostStorageService();
+  int? selectedDay;
+  Map<int, List<ScheduledPost>> scheduledPosts = {};
+  bool isLoading = true;
+
+  int currentYear = 2026;
+  int currentMonth = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPosts();
+  }
+
+  Future<void> _loadPosts() async {
+    setState(() => isLoading = true);
+    final posts = await _storageService.getPostsForMonth(currentYear, currentMonth);
+    setState(() {
+      scheduledPosts = posts;
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Text(
               'Calendar',
               style: AppTextStyles.heading1,
             ),
             const SizedBox(height: 4),
             Text(
-              'View and manage your scheduled posts',
+              'January $currentYear • Today: 28 Jan',
               style: AppTextStyles.bodySmall,
             ),
             const SizedBox(height: 24),
 
-            // Calendar Card
+            _buildPlatformLegend(),
+            const SizedBox(height: 16),
+
             _buildCalendarCard(),
 
             const SizedBox(height: 24),
 
-            // Scheduled Posts Header
-            Text(
-              'Scheduled Posts',
-              style: AppTextStyles.heading3,
-            ),
-            const SizedBox(height: 12),
-
-            // Scheduled Posts List
-            _buildScheduledPostItem(
-              'Instagram Reel',
-              'December 16, 2025',
-              '18:30',
-              Icons.camera_alt,
-              AppColors.primary,
-            ),
-            const SizedBox(height: 8),
-
-            _buildScheduledPostItem(
-              'LinkedIn Post',
-              'December 16, 2025',
-              '19:45',
-              Icons.article,
-              AppColors.primaryDark,
-            ),
-            const SizedBox(height: 8),
-
-            _buildScheduledPostItem(
-              'Review Coco feedback',
-              'December 16, 2025',
-              '18:00 - 18:30',
-              Icons.task_alt,
-              AppColors.success,
-            ),
+            if (selectedDay != null)
+              _buildSelectedDayDetails()
+            else
+              _buildAllScheduledPosts(),
           ],
         ),
       ),
     );
   }
 
-// ... rest of the widget methods from before
+  Widget _buildPlatformLegend() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _buildLegendItem('Instagram', _getPlatformColor('Instagram')),
+        _buildLegendItem('Facebook', _getPlatformColor('Facebook')),
+        _buildLegendItem('LinkedIn', _getPlatformColor('LinkedIn')),
+      ],
+    );
+  }
+
+  Widget _buildLegendItem(String platform, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 12,
+          height: 12,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(platform, style: AppTextStyles.caption),
+      ],
+    );
+  }
+
+  Color _getPlatformColor(String platform) {
+    switch (platform.toLowerCase()) {
+      case 'instagram':
+        return const Color(0xFFE4405F);
+      case 'facebook':
+        return const Color(0xFF1877F2);
+      case 'linkedin':
+        return const Color(0xFF0A66C2);
+      case 'tiktok':
+        return Colors.black;
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  Widget _buildCalendarCard() {
+    return CustomCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary),
+                onPressed: () {
+                  // TODO: Previous month
+                },
+              ),
+              Text(
+                'January $currentYear',
+                style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
+                onPressed: () {
+                  // TODO: Next month
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+                .map((day) => SizedBox(
+              width: 40,
+              child: Center(
+                child: Text(
+                  day,
+                  style: AppTextStyles.caption.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ))
+                .toList(),
+          ),
+
+          const SizedBox(height: 12),
+
+          Column(
+            children: [
+              _buildWeekRow([null, null, null, 1, 2, 3, 4]),
+              _buildWeekRow([5, 6, 7, 8, 9, 10, 11]),
+              _buildWeekRow([12, 13, 14, 15, 16, 17, 18]),
+              _buildWeekRow([19, 20, 21, 22, 23, 24, 25]),
+              _buildWeekRow([26, 27, 28, 29, 30, 31, null]),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeekRow(List<int?> days) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: days.map((day) {
+          if (day == null) {
+            return const SizedBox(width: 40, height: 40);
+          }
+
+          final hasPosts = scheduledPosts.containsKey(day);
+          final posts = scheduledPosts[day] ?? [];
+          final isToday = day == 28;
+          final isSelected = day == selectedDay;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedDay = day;
+              });
+            },
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary
+                    : isToday
+                    ? AppColors.primary.withOpacity(0.2)
+                    : Colors.transparent,
+                shape: BoxShape.circle,
+                border: isToday && !isSelected
+                    ? Border.all(color: AppColors.primary, width: 2)
+                    : null,
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    day.toString(),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: isSelected
+                          ? AppColors.textWhite
+                          : AppColors.textPrimary,
+                      fontWeight: isToday || hasPosts
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  if (hasPosts && !isSelected)
+                    Positioned(
+                      bottom: 6,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: posts.take(3).map((post) {
+                          return Container(
+                            width: 4,
+                            height: 4,
+                            margin: const EdgeInsets.symmetric(horizontal: 1),
+                            decoration: BoxDecoration(
+                              color: _getPlatformColor(post.platform),
+                              shape: BoxShape.circle,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildSelectedDayDetails() {
+    final posts = scheduledPosts[selectedDay] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'January $selectedDay, $currentYear',
+              style: AppTextStyles.heading3,
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedDay = null;
+                });
+              },
+              child: Text(
+                'View All',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.primary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        if (posts.isEmpty)
+          CustomCard(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.event_available,
+                  color: AppColors.textSecondary,
+                  size: 48,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'No posts scheduled',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () => _showAddPostDialog(selectedDay!),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Post'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.textWhite,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ...posts.map((post) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: _buildPostCard(post, selectedDay!),
+          )),
+
+        if (posts.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showAddPostDialog(selectedDay!),
+                icon: const Icon(Icons.add),
+                label: const Text('Add Another Post'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: BorderSide(color: AppColors.border),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildAllScheduledPosts() {
+    final allDays = scheduledPosts.keys.toList()..sort();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'All Scheduled Posts',
+          style: AppTextStyles.heading3,
+        ),
+        const SizedBox(height: 12),
+
+        ...allDays.map((day) {
+          final posts = scheduledPosts[day]!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                child: Text(
+                  'January $day, $currentYear',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+              ...posts.map((post) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: _buildPostCard(post, day),
+              )),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildPostCard(ScheduledPost post, int day) {
+    final platformColor = _getPlatformColor(post.platform);
+
+    return CustomCard(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: platformColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: platformColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      post.platform,
+                      style: AppTextStyles.caption.copyWith(
+                        color: platformColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (post.isDraft) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Draft',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.warning,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+              const Spacer(),
+              PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textSecondary,
+                  size: 20,
+                ),
+                onSelected: (value) async {
+                  if (value == 'edit') {
+                    await _showEditPostDialog(post, day);
+                  } else if (value == 'delete') {
+                    await _deletePost(post);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Text('Edit'),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Text('Delete'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            post.topic,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (post.time != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Time: ${post.time}',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+          if (post.note != null) ...[
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.note_outlined,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      post.note!,
+                      style: AppTextStyles.caption,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showAddPostDialog(int day) async {
+    final result = await showDialog<ScheduledPost>(
+      context: context,
+      builder: (context) => AddPostDialog(
+        selectedDate: DateTime(currentYear, currentMonth, day),
+      ),
+    );
+
+    if (result != null) {
+      await _storageService.addPost(result);
+      await _loadPosts();
+    }
+  }
+
+  Future<void> _showEditPostDialog(ScheduledPost post, int day) async {
+    final result = await showDialog<ScheduledPost>(
+      context: context,
+      builder: (context) => AddPostDialog(
+        selectedDate: DateTime(currentYear, currentMonth, day),
+        existingPost: post,
+      ),
+    );
+
+    if (result != null) {
+      await _storageService.updatePost(result);
+      await _loadPosts();
+    }
+  }
+
+  Future<void> _deletePost(ScheduledPost post) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Post'),
+        content: const Text('Are you sure you want to delete this post?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.error,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await _storageService.deletePost(post.id);
+      await _loadPosts();
+    }
+  }
 }
 
-// Calendar screen WITHOUT navbar (for push navigation - if needed)
+// Calendar screen WITHOUT navbar
 class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
 
@@ -97,192 +595,4 @@ class CalendarScreen extends StatelessWidget {
       body: const CalendarScreenWithNavbar(),
     );
   }
-}
-
-// Shared widget methods
-Widget _buildCalendarCard() {
-  return CustomCard(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-        // Month navigation
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary),
-              onPressed: () {},
-            ),
-            Text(
-              'December 2025',
-              style: AppTextStyles.bodySmall.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
-              onPressed: () {},
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 12),
-
-        // Weekday headers
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: ['M', 'T', 'W', 'T', 'F', 'S', 'S']
-              .map((day) => SizedBox(
-            width: 40,
-            child: Center(
-              child: Text(
-                day,
-                style: AppTextStyles.caption.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ),
-          ))
-              .toList(),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Calendar grid
-        Column(
-          children: [
-            _buildWeekRow([1, 2, 3, 4, 5, 6, 7], [16]),
-            _buildWeekRow([8, 9, 10, 11, 12, 13, 14], [16]),
-            _buildWeekRow([15, 16, 17, 18, 19, 20, 21], [16]),
-            _buildWeekRow([22, 23, 24, 25, 26, 27, 28], [16]),
-            _buildWeekRow([29, 30, 31, null, null, null, null], [16]),
-          ],
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildWeekRow(List<int?> days, List<int> highlightedDays) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: days.map((day) {
-        if (day == null) {
-          return const SizedBox(width: 40, height: 40);
-        }
-
-        final isHighlighted = highlightedDays.contains(day);
-        final isToday = day == 16;
-
-        return Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: isToday
-                ? AppColors.primary
-                : isHighlighted
-                ? AppColors.primary.withOpacity(0.1)
-                : Colors.transparent,
-            shape: BoxShape.circle,
-          ),
-          child: Center(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Text(
-                  day.toString(),
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: isToday
-                        ? AppColors.textWhite
-                        : isHighlighted
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
-                    fontWeight: isToday || isHighlighted
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                ),
-                if (isHighlighted && !isToday)
-                  Positioned(
-                    bottom: 4,
-                    child: Container(
-                      width: 4,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
-    ),
-  );
-}
-
-Widget _buildScheduledPostItem(
-    String title,
-    String date,
-    String time,
-    IconData icon,
-    Color iconColor,
-    ) {
-  return CustomCard(
-    padding: const EdgeInsets.all(12),
-    child: Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: 12),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTextStyles.bodySmall.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '$date\n$time',
-                style: AppTextStyles.caption.copyWith(
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        IconButton(
-          icon: Icon(
-            Icons.more_vert,
-            color: AppColors.textSecondary,
-            size: 20,
-          ),
-          onPressed: () {},
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-        ),
-      ],
-    ),
-  );
 }

@@ -129,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // Dashboard Screen (Main Home Content)
+// Dashboard Screen (Main Home Content)
 class DashboardScreen extends StatelessWidget {
   final Function(int) onNavigate;
 
@@ -141,31 +142,23 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Dashboard',
-                  style: AppTextStyles.heading1,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Ichbin Architekt',
-                  style: AppTextStyles.bodySmall,
-                ),
-              ],
-            ),
+            // Header with gradient
+            _buildHeader(),
+            const SizedBox(height: 20),
 
-            const SizedBox(height: 32),
-
+            // Your Performance Card
             _buildPerformanceCard(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            // Let's Review Card
             _buildReviewCard(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            // Your Calendar Card
             _buildCalendarCard(context),
           ],
         ),
@@ -173,37 +166,72 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPerformanceCard() {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary,
+            AppColors.primaryDark,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
         children: [
-          Text(
-            'Your performance',
-            style: AppTextStyles.heading3,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.person_outline,
+              color: Colors.white,
+              size: 32,
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            'past 7 days',
-            style: AppTextStyles.caption,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dashboard',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Lena Hoffman',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 80),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: GestureDetector(
-              onTap: () => onNavigate(1),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_downward,
-                  color: AppColors.primary,
-                  size: 20,
-                ),
-              ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 24,
             ),
           ),
         ],
@@ -211,89 +239,249 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewCard() {
+  Widget _buildPerformanceCard() {
     return CustomCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Let's Review",
-            style: AppTextStyles.heading3,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'You have been using COCO for 999 days now. Let\'s see your strengths and work on what could be better.',
-            style: AppTextStyles.bodySmall,
-          ),
-          const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: GestureDetector(
-              onTap: () => onNavigate(1),
-              child: Container(
-                padding: const EdgeInsets.all(12),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primary.withOpacity(0.2),
+                      AppColors.primaryLight.withOpacity(0.2),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
-                  Icons.arrow_downward,
+                child: Icon(
+                  Icons.trending_up,
                   color: AppColors.primary,
-                  size: 20,
+                  size: 24,
                 ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your performance',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'past 7 days',
+                      style: AppTextStyles.caption.copyWith(
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildArrowButton(() => onNavigate(1)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Mini stats row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildMiniStat('12', 'Posts', Icons.article_outlined),
+              Container(
+                width: 1,
+                height: 40,
+                color: AppColors.border,
+              ),
+              _buildMiniStat('3.5k', 'Reach', Icons.visibility_outlined),
+              Container(
+                width: 1,
+                height: 40,
+                color: AppColors.border,
+              ),
+              _buildMiniStat('24%', 'Engagement', Icons.favorite_outline),
+            ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMiniStat(String value, String label, IconData icon) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          color: AppColors.primary,
+          size: 20,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: AppTextStyles.bodySmall.copyWith(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.caption.copyWith(
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReviewCard() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.accent.withOpacity(0.3),
+            AppColors.primaryLight.withOpacity(0.2),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: CustomCard(
+        backgroundColor: Colors.transparent,
+        hasShadow: false,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.star_outline,
+                    color: AppColors.primary,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    "Let's Review",
+                    style: AppTextStyles.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                _buildArrowButton(() => onNavigate(1)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'You have been using COCO for 60 days now. Let\'s see your strengths and work on what could be better.',
+              style: AppTextStyles.caption.copyWith(
+                fontSize: 12,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCalendarCard(BuildContext context) {
     return CustomCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Your Calendar',
-            style: AppTextStyles.heading3,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '16th December, 2025',
-            style: AppTextStyles.bodySmall,
-          ),
-          const SizedBox(height: 20),
-
-          _buildScheduledItem('Instagram Reel', 'scheduled for 18:30'),
-          const SizedBox(height: 12),
-          _buildScheduledItem('LinkedIn Post', 'scheduled for 19:45'),
-          const SizedBox(height: 12),
-          _buildScheduledItem(
-            '"Review Coco feedback on previous 90 days"',
-            '18:00 - 18:30',
-          ),
-
-          const SizedBox(height: 24),
-
-          Align(
-            alignment: Alignment.bottomRight,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onNavigate(3), // Navigate to Calendar tab (index 3)
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_downward,
-                  color: AppColors.primary,
-                  size: 20,
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your Calendar',
+                      style: AppTextStyles.heading3.copyWith(
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '28th January, 2026',
+                      style: AppTextStyles.caption,
+                    ),
+                  ],
                 ),
               ),
+              GestureDetector(
+                onTap: () => onNavigate(3),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.textPrimary.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.arrow_downward,
+                    color: AppColors.textPrimary,
+                    size: 18,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Today's posts
+          _buildScheduledItem('Instagram Reel', 'scheduled for 14:30'),
+          const SizedBox(height: 8),
+          _buildScheduledItem('LinkedIn Post', 'scheduled for 18:45'),
+
+          const SizedBox(height: 16),
+
+          // Divider
+          Container(
+            height: 1,
+            color: AppColors.border,
+          ),
+
+          const SizedBox(height: 12),
+
+          // Next upcoming
+          Text(
+            'Next Upcoming',
+            style: AppTextStyles.caption.copyWith(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
             ),
+          ),
+          const SizedBox(height: 8),
+          _buildScheduledItem(
+            'Instagram Post - Eco-friendly materials',
+            'Jan 31 at 10:00',
           ),
         ],
       ),
@@ -306,7 +494,7 @@ class DashboardScreen extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
-            color: AppColors.primary,
+            color: AppColors.textPrimary,
             width: 2,
           ),
         ),
@@ -318,14 +506,88 @@ class DashboardScreen extends StatelessWidget {
             title,
             style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
+              fontSize: 13,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             time,
-            style: AppTextStyles.caption,
+            style: AppTextStyles.caption.copyWith(
+              fontSize: 11,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactScheduledItem(
+      IconData icon,
+      String title,
+      String time,
+      Color color,
+      ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              title,
+              style: AppTextStyles.caption.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ),
+          Text(
+            time,
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildArrowButton(VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(
+          Icons.arrow_forward,
+          color: AppColors.primary,
+          size: 18,
+        ),
       ),
     );
   }
