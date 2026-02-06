@@ -17,13 +17,18 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  // ✅ Changed from field to method
   List<Widget> get _screens => [
-    const DashboardScreen(),
+    DashboardScreen(onNavigate: _navigateToIndex),
     const AnalyticsScreen(),
     const NewPostScreen(),
     const ProfileScreen(),
   ];
+
+  void _navigateToIndex(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +124,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Dashboard Screen (Main Home Content)
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final Function(int) onNavigate;
+
+  const DashboardScreen({
+    super.key,
+    required this.onNavigate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -148,12 +158,12 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // Your Performance Card
-            _buildPerformanceCard(context),
+            _buildPerformanceCard(),
 
             const SizedBox(height: 20),
 
             // Let's Review Card
-            _buildReviewCard(context),
+            _buildReviewCard(),
 
             const SizedBox(height: 20),
 
@@ -165,7 +175,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPerformanceCard(BuildContext context) {
+  Widget _buildPerformanceCard() {
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,18 +190,10 @@ class DashboardScreen extends StatelessWidget {
             style: AppTextStyles.caption,
           ),
           const SizedBox(height: 80),
-          // Arrow button
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AnalyticsScreen(),
-                  ),
-                );
-              },
+              onTap: () => onNavigate(1),
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -211,7 +213,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReviewCard(BuildContext context) {
+  Widget _buildReviewCard() {
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,18 +228,10 @@ class DashboardScreen extends StatelessWidget {
             style: AppTextStyles.bodySmall,
           ),
           const SizedBox(height: 24),
-          // Arrow button
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AnalyticsScreen(),
-                  ),
-                );
-              },
+              onTap: () => onNavigate(1),
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -273,7 +267,6 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // Scheduled posts
           _buildScheduledItem('Instagram Reel', 'scheduled for 18:30'),
           const SizedBox(height: 12),
           _buildScheduledItem('LinkedIn Post', 'scheduled for 19:45'),
@@ -285,11 +278,12 @@ class DashboardScreen extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Arrow button
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () {
+                print('Calendar button tapped!');
                 Navigator.push(
                   context,
                   MaterialPageRoute(

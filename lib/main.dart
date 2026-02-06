@@ -22,6 +22,16 @@ class MyApp extends StatelessWidget {
           seedColor: AppColors.primary,
           brightness: Brightness.light,
         ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(color: AppColors.textPrimary),
+          titleTextStyle: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
       home: const HomeScreen(),
     );
