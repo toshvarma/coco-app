@@ -21,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     DashboardScreen(onNavigate: _navigateToIndex),
     const AnalyticsScreen(),
     const NewPostScreen(),
+    const CalendarScreenWithNavbar(), // Add Calendar screen
     const ProfileScreen(),
   ];
 
@@ -53,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -69,14 +70,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               _buildNavItem(
                 icon: Icons.add_circle_rounded,
-                label: 'New Post',
+                label: 'New',
                 index: 2,
                 isCenter: true,
               ),
               _buildNavItem(
+                icon: Icons.calendar_today_rounded,
+                label: 'Calendar',
+                index: 3,
+              ),
+              _buildNavItem(
                 icon: Icons.person_rounded,
                 label: 'Profile',
-                index: 3,
+                index: 4,
               ),
             ],
           ),
@@ -97,20 +103,20 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: () => setState(() => _currentIndex = index),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
               color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              size: isCenter ? 32 : 28,
+              size: isCenter ? 32 : 26,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: isSelected ? AppColors.primary : AppColors.textSecondary,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
@@ -139,7 +145,6 @@ class DashboardScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -157,17 +162,10 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            // Your Performance Card
             _buildPerformanceCard(),
-
             const SizedBox(height: 20),
-
-            // Let's Review Card
             _buildReviewCard(),
-
             const SizedBox(height: 20),
-
-            // Your Calendar Card
             _buildCalendarCard(context),
           ],
         ),
@@ -282,15 +280,7 @@ class DashboardScreen extends StatelessWidget {
             alignment: Alignment.bottomRight,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                print('Calendar button tapped!');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CalendarScreen(),
-                  ),
-                );
-              },
+              onTap: () => onNavigate(3), // Navigate to Calendar tab (index 3)
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
