@@ -6,6 +6,7 @@ import 'package:coco_app/presentation/screens/analytics_screen.dart';
 import 'package:coco_app/presentation/screens/new_post_screen.dart';
 import 'package:coco_app/presentation/screens/calendar_screen.dart';
 import 'package:coco_app/presentation/screens/profile_screen.dart';
+import 'package:coco_app/presentation/screens/chat_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -37,6 +38,18 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.background,
       body: _screens[_currentIndex],
       bottomNavigationBar: _buildBottomNavBar(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatScreen()),
+          );
+        },
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+        label: const Text('AI Chat', style: TextStyle(color: Colors.white)),
+        elevation: 4,
+      ),
     );
   }
 
