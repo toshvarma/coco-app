@@ -1,91 +1,348 @@
 import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
-import 'package:coco_app/core/widgets/custom_button.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
+import 'package:coco_app/presentation/screens/analytics_screen.dart';
+import 'package:coco_app/presentation/screens/new_post_screen.dart';
+import 'package:coco_app/presentation/screens/calendar_screen.dart';
+import 'package:coco_app/presentation/screens/profile_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  // ✅ Changed from field to method
+  List<Widget> get _screens => [
+    const DashboardScreen(),
+    const AnalyticsScreen(),
+    const NewPostScreen(),
+    const ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: _screens[_currentIndex],
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const Text('Dashboard', style: AppTextStyles.heading1),
-              const SizedBox(height: 8),
-              const Text(
-                'Manage your social media presence',
-                style: AppTextStyles.bodySmall,
+              _buildNavItem(
+                icon: Icons.home_rounded,
+                label: 'Home',
+                index: 0,
               ),
-              const SizedBox(height: 32),
-
-              CustomCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Your Performance', style: AppTextStyles.heading3),
-                    const SizedBox(height: 4),
-                    const Text('Past 7 days', style: AppTextStyles.caption),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildStatItem('12', 'Posts'),
-                        _buildStatItem('3.5k', 'Reach'),
-                        _buildStatItem('24%', 'Engagement'),
-                      ],
-                    ),
-                  ],
-                ),
+              _buildNavItem(
+                icon: Icons.bar_chart_rounded,
+                label: 'Stats',
+                index: 1,
               ),
-
-              const SizedBox(height: 32),
-              const Text('Quick Actions', style: AppTextStyles.heading2),
-              const SizedBox(height: 16),
-
-              CustomButton(
-                text: 'Create New Post',
-                onPressed: () {},
-                type: ButtonType.gradient,
-                icon: Icons.add_circle_outline,
-                isFullWidth: true,
+              _buildNavItem(
+                icon: Icons.add_circle_rounded,
+                label: 'New Post',
+                index: 2,
+                isCenter: true,
               ),
-
-              const SizedBox(height: 12),
-
-              CustomButton(
-                text: 'View Analytics',
-                onPressed: () {},
-                type: ButtonType.secondary,
-                icon: Icons.analytics_outlined,
-                isFullWidth: true,
+              _buildNavItem(
+                icon: Icons.person_rounded,
+                label: 'Profile',
+                index: 3,
               ),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.chat_bubble_outline),
-        label: const Text('AI Help'),
+    );
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required int index,
+    bool isCenter = false,
+  }) {
+    final isSelected = _currentIndex == index;
+
+    return GestureDetector(
+      onTap: () => setState(() => _currentIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              size: isCenter ? 32 : 28,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Dashboard Screen (Main Home Content)
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Dashboard',
+                  style: AppTextStyles.heading1,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Ichbin Architekt',
+                  style: AppTextStyles.bodySmall,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+
+            // Your Performance Card
+            _buildPerformanceCard(context),
+
+            const SizedBox(height: 20),
+
+            // Let's Review Card
+            _buildReviewCard(context),
+
+            const SizedBox(height: 20),
+
+            // Your Calendar Card
+            _buildCalendarCard(context),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatItem(String value, String label) {
-    return Column(
-      children: [
-        Text(value, style: AppTextStyles.heading2.copyWith(color: AppColors.primary)),
-        const SizedBox(height: 4),
-        Text(label, style: AppTextStyles.caption),
-      ],
+  Widget _buildPerformanceCard(BuildContext context) {
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your performance',
+            style: AppTextStyles.heading3,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'past 7 days',
+            style: AppTextStyles.caption,
+          ),
+          const SizedBox(height: 80),
+          // Arrow button
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AnalyticsScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.arrow_downward,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReviewCard(BuildContext context) {
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Let's Review",
+            style: AppTextStyles.heading3,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'You have been using COCO for 999 days now. Let\'s see your strengths and work on what could be better.',
+            style: AppTextStyles.bodySmall,
+          ),
+          const SizedBox(height: 24),
+          // Arrow button
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AnalyticsScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.arrow_downward,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarCard(BuildContext context) {
+    return CustomCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your Calendar',
+            style: AppTextStyles.heading3,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '16th December, 2025',
+            style: AppTextStyles.bodySmall,
+          ),
+          const SizedBox(height: 20),
+
+          // Scheduled posts
+          _buildScheduledItem('Instagram Reel', 'scheduled for 18:30'),
+          const SizedBox(height: 12),
+          _buildScheduledItem('LinkedIn Post', 'scheduled for 19:45'),
+          const SizedBox(height: 12),
+          _buildScheduledItem(
+            '"Review Coco feedback on previous 90 days"',
+            '18:00 - 18:30',
+          ),
+
+          const SizedBox(height: 24),
+
+          // Arrow button
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CalendarScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.arrow_downward,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScheduledItem(String title, String time) {
+    return Container(
+      padding: const EdgeInsets.only(left: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          left: BorderSide(
+            color: AppColors.primary,
+            width: 2,
+          ),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: AppTextStyles.bodySmall.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            time,
+            style: AppTextStyles.caption,
+          ),
+        ],
+      ),
     );
   }
 }

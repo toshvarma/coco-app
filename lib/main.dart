@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Social Media Helper',
+      title: 'COCO - Social Media Helper',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: AppColors.primary,
