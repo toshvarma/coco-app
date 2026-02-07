@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import '../../core/constants/colors.dart';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'template_selection_screen.dart';
@@ -36,7 +35,6 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
   void initState() {
     super.initState();
 
-    // Start with AI's response (hide the user's context message)
     _messages = [
       ChatMessage(
         id: 'welcome',
@@ -46,7 +44,6 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
       ),
     ];
 
-    // Scroll to bottom after build
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
@@ -82,11 +79,8 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
     _scrollToBottom();
 
     try {
-      // Build chat history including the hidden context
       final chatHistory = [
-        // Include the original context from questionnaire
         ...widget.initialMessages.map((msg) => msg.toApiFormat()),
-        // Add visible conversation
         ..._messages.skip(1).map((msg) => msg.toApiFormat()),
       ];
 
@@ -144,11 +138,13 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.close, color: AppColors.background),
+          icon: Icon(Icons.close, color: colorScheme.onPrimary),
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -161,19 +157,19 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
           children: [
             Text(
               'AI Content Creator',
-              style: TextStyle(color: AppColors.background),
+              style: TextStyle(color: colorScheme.onPrimary),
             ),
             Text(
               '${widget.platform} • ${widget.occasion}',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                color: AppColors.background.withOpacity(0.9),
+                color: colorScheme.onPrimary.withOpacity(0.9),
               ),
             ),
           ],
         ),
-        backgroundColor: AppColors.primarygreen,
+        backgroundColor: colorScheme.primaryContainer,
         elevation: 0,
         actions: [
           Padding(
@@ -182,13 +178,13 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   '1/2',
                   style: TextStyle(
-                    color: AppColors.primarygreen,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -200,10 +196,7 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
       ),
       body: Column(
         children: [
-          // Context banner
           _buildContextBanner(),
-
-          // Messages
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
@@ -212,7 +205,6 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               itemBuilder: (context, index) {
                 final message = _messages[index];
 
-                // Calculate AI message number (only count AI responses)
                 int? aiMessageNumber;
                 if (!message.isUser) {
                   aiMessageNumber = _messages
@@ -241,14 +233,14 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
                     height: 16,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primarygreen),
+                      valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     'AI is creating...',
                     style: TextStyle(
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                       fontSize: 13,
                     ),
                   ),
@@ -256,13 +248,12 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               ),
             ),
 
-          // Templates button (above message input)
           Container(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               border: Border(
-                top: BorderSide(color: Colors.grey[200]!),
+                top: BorderSide(color: colorScheme.outline.withOpacity(0.2)),
               ),
             ),
             child: SizedBox(
@@ -270,17 +261,17 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               height: 48,
               child: OutlinedButton.icon(
                 onPressed: _navigateToTemplates,
-                icon: Icon(Icons.dashboard_customize, color: AppColors.primarygreen, size: 20),
+                icon: Icon(Icons.dashboard_customize, color: colorScheme.primary, size: 20),
                 label: Text(
                   'Choose Template',
                   style: TextStyle(
-                    color: AppColors.primarygreen,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
                   ),
                 ),
                 style: OutlinedButton.styleFrom(
-                  side: BorderSide(color: AppColors.primarygreen, width: 2),
+                  side: BorderSide(color: colorScheme.primary, width: 2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -289,7 +280,6 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
             ),
           ),
 
-          // Message input
           _buildMessageInput(),
         ],
       ),
@@ -297,29 +287,31 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
   }
 
   Widget _buildContextBanner() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.primarygreen.withOpacity(0.1),
-            AppColors.lightGreen.withOpacity(0.1),
+            colorScheme.primaryContainer.withOpacity(0.1),
+            colorScheme.secondaryContainer.withOpacity(0.1),
           ],
         ),
         border: Border(
-          bottom: BorderSide(color: AppColors.primarygreen.withOpacity(0.2)),
+          bottom: BorderSide(color: colorScheme.primary.withOpacity(0.2)),
         ),
       ),
       child: Row(
         children: [
-          Icon(Icons.lightbulb_outline, size: 16, color: AppColors.primarygreen),
+          Icon(Icons.lightbulb_outline, size: 16, color: colorScheme.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Tip: Ask AI to refine, shorten, or add emojis to any suggestion',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey[700],
+                color: colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
           ),
@@ -329,10 +321,12 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
   }
 
   Widget _buildMessageInput() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -348,22 +342,22 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: 'Ask AI to refine or suggest...',
-                hintStyle: TextStyle(color: Colors.grey[400]),
+                hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.lightGreen),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.lightGreen),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.primarygreen, width: 2),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: colorScheme.background,
               ),
               onSubmitted: (_) => _sendMessage(),
               maxLines: null,
@@ -374,63 +368,17 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.primarygreen, AppColors.primarygreen],
+                colors: [colorScheme.primary, colorScheme.primary],
               ),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.send_rounded, color: Colors.white),
+              icon: Icon(Icons.send_rounded, color: colorScheme.onPrimary),
               onPressed: _sendMessage,
             ),
           ),
         ],
       ),
-    );
-  }
-
-  void _showProjectInfo() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Project Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow('Occasion:', widget.occasion),
-            const SizedBox(height: 8),
-            _buildInfoRow('Platform:', widget.platform),
-            const SizedBox(height: 8),
-            _buildInfoRow('Description:', widget.description),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 13,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 14),
-        ),
-      ],
     );
   }
 
@@ -445,16 +393,18 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
 class _ChatBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback onCopy;
-  final int? messageNumber; // Add this parameter
+  final int? messageNumber;
 
   const _ChatBubble({
     required this.message,
     required this.onCopy,
-    this.messageNumber, // Add this
+    this.messageNumber,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: GestureDetector(
@@ -466,7 +416,7 @@ class _ChatBubble extends StatelessWidget {
             maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
           decoration: BoxDecoration(
-            color: message.isUser ? AppColors.primarygreen : Colors.white,
+            color: message.isUser ? colorScheme.primaryContainer : colorScheme.surface,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(20),
               topRight: const Radius.circular(20),
@@ -484,12 +434,11 @@ class _ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Message number for AI responses
               if (!message.isUser && messageNumber != null) ...[
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.primarygreen.withOpacity(0.1),
+                    color: colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -498,7 +447,7 @@ class _ChatBubble extends StatelessWidget {
                       Icon(
                         Icons.auto_awesome,
                         size: 12,
-                        color: AppColors.primarygreen,
+                        color: colorScheme.primary,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -506,7 +455,7 @@ class _ChatBubble extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primarygreen,
+                          color: colorScheme.primary,
                         ),
                       ),
                     ],
@@ -515,12 +464,11 @@ class _ChatBubble extends StatelessWidget {
                 const SizedBox(height: 8),
               ],
 
-              // Message content
               if (message.isUser)
                 Text(
                   message.content,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
                     fontSize: 15,
                     height: 1.4,
                   ),
@@ -529,53 +477,53 @@ class _ChatBubble extends StatelessWidget {
                 MarkdownBody(
                   data: message.content,
                   styleSheet: MarkdownStyleSheet(
-                    p: const TextStyle(
-                      color: Colors.black87,
+                    p: TextStyle(
+                      color: colorScheme.onSurface,
                       fontSize: 15,
                       height: 1.4,
                     ),
                     strong: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
-                    em: const TextStyle(
+                    em: TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                     listBullet: TextStyle(
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                       fontSize: 15,
                     ),
                     code: TextStyle(
-                      backgroundColor: AppColors.background,
-                      color: AppColors.primarygreen,
+                      backgroundColor: colorScheme.background,
+                      color: colorScheme.primary,
                       fontFamily: 'monospace',
                     ),
                     h1: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
                     h2: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
                     h3: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
                     blockquote: TextStyle(
-                      color: Colors.grey[700],
+                      color: colorScheme.onSurface.withOpacity(0.7),
                       fontStyle: FontStyle.italic,
                     ),
                     blockquoteDecoration: BoxDecoration(
-                      color: AppColors.background,
+                      color: colorScheme.background,
                       borderRadius: BorderRadius.circular(4),
                       border: Border(
                         left: BorderSide(
-                          color: AppColors.primarygreen,
+                          color: colorScheme.primary,
                           width: 3,
                         ),
                       ),
@@ -590,7 +538,7 @@ class _ChatBubble extends StatelessWidget {
                     'Long press to copy',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey[500],
+                      color: colorScheme.onSurface.withOpacity(0.5),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
