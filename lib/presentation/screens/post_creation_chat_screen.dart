@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';  // Add this
 import '../../core/constants/colors.dart';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
@@ -392,14 +393,74 @@ class _ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                message.content,
-                style: TextStyle(
-                  color: message.isUser ? Colors.white : Colors.black87,
-                  fontSize: 15,
-                  height: 1.4,
+              // Use Markdown for AI messages, plain text for user messages
+              if (message.isUser)
+                Text(
+                  message.content,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    height: 1.4,
+                  ),
+                )
+              else
+                MarkdownBody(
+                  data: message.content,
+                  styleSheet: MarkdownStyleSheet(
+                    p: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 15,
+                      height: 1.4,
+                    ),
+                    strong: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primarygreen,
+                    ),
+                    em: const TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.black87,
+                    ),
+                    listBullet: TextStyle(
+                      color: AppColors.primarygreen,
+                      fontSize: 15,
+                    ),
+                    code: TextStyle(
+                      backgroundColor: AppColors.background,
+                      color: AppColors.primarygreen,
+                      fontFamily: 'monospace',
+                    ),
+                    h1: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primarygreen,
+                    ),
+                    h2: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primarygreen,
+                    ),
+                    h3: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primarygreen,
+                    ),
+                    blockquote: TextStyle(
+                      color: Colors.grey[700],
+                      fontStyle: FontStyle.italic,
+                    ),
+                    blockquoteDecoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border(
+                        left: BorderSide(
+                          color: AppColors.primarygreen,
+                          width: 3,
+                        ),
+                      ),
+                    ),
+                  ),
+                  selectable: true, // Allows user to select and copy text
                 ),
-              ),
               if (!message.isUser)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
