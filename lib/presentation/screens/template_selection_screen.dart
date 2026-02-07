@@ -328,21 +328,50 @@ Make each version unique and optimized for its specific format. Be creative and 
   }
 
   Widget _buildSwipeableTemplates() {
-    return Stack(
+    return Column(
       children: [
-        PageView.builder(
-          controller: _pageController,
-          itemCount: _generatedTemplates.length,
-          onPageChanged: (index) {
-            setState(() {
-              _currentPage = index;
-            });
-          },
-          itemBuilder: (context, index) {
-            return _buildTemplatePage(_generatedTemplates[index]);
-          },
+        // Swipeable templates
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: _generatedTemplates.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return _buildTemplatePage(_generatedTemplates[index]);
+            },
+          ),
         ),
 
+        // Fixed button at bottom (doesn't swipe)
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+          child: SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton(
+              onPressed: () => _selectTemplate(_generatedTemplates[_currentPage]),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primarygreen,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+              child: const Text(
+                'Select Template',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -500,34 +529,7 @@ Make each version unique and optimized for its specific format. Be creative and 
               ),
             ),
 
-          const Spacer(),
-
-          // Select Template button at bottom
-          Padding(
-            padding: const EdgeInsets.only(bottom: 40),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton(
-                onPressed: () => _selectTemplate(template),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primarygreen,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 2,
-                ),
-                child: const Text(
-                  'Select Template',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Remove Spacer and button from here - they're now fixed at bottom
         ],
       ),
     );
