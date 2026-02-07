@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 
 enum ButtonType {
@@ -33,72 +32,83 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: isFullWidth ? double.infinity : null,
-      child: _buildButton(),
+      child: _buildButton(context),
     );
   }
 
-  Widget _buildButton() {
+  Widget _buildButton(BuildContext context) {
     switch (type) {
       case ButtonType.primary:
-        return _buildPrimaryButton();
+        return _buildPrimaryButton(context);
       case ButtonType.secondary:
-        return _buildSecondaryButton();
+        return _buildSecondaryButton(context);
       case ButtonType.text:
-        return _buildTextButton();
+        return _buildTextButton(context);
       case ButtonType.gradient:
-        return _buildGradientButton();
+        return _buildGradientButton(context);
     }
   }
 
-  Widget _buildPrimaryButton() {
+  Widget _buildPrimaryButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textWhite,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 0,
       ),
-      child: _buildButtonContent(),
+      child: _buildButtonContent(context),
     );
   }
 
-  Widget _buildSecondaryButton() {
+  Widget _buildSecondaryButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return OutlinedButton(
       onPressed: isLoading ? null : onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primary,
+        foregroundColor: colorScheme.primary,
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        side: const BorderSide(color: AppColors.border, width: 1.5),
+        side: BorderSide(
+          color: colorScheme.outline.withOpacity(0.5),
+          width: 1.5,
+        ),
       ),
-      child: _buildButtonContent(),
+      child: _buildButtonContent(context),
     );
   }
 
-  Widget _buildTextButton() {
+  Widget _buildTextButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return TextButton(
       onPressed: isLoading ? null : onPressed,
       style: TextButton.styleFrom(
-        foregroundColor: AppColors.primary,
+        foregroundColor: colorScheme.primary,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       ),
-      child: _buildButtonContent(),
+      child: _buildButtonContent(context),
     );
   }
 
-  Widget _buildGradientButton() {
+  Widget _buildGradientButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [
-            AppColors.gradientStart,
-            AppColors.gradientEnd,
+            colorScheme.primaryContainer,
+            colorScheme.primary,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -106,7 +116,7 @@ class CustomButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: colorScheme.primary.withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -116,26 +126,28 @@ class CustomButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
-          foregroundColor: AppColors.textWhite,
+          foregroundColor: colorScheme.onPrimary,
           shadowColor: Colors.transparent,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: _buildButtonContent(),
+        child: _buildButtonContent(context),
       ),
     );
   }
 
-  Widget _buildButtonContent() {
+  Widget _buildButtonContent(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (isLoading) {
-      return const SizedBox(
+      return SizedBox(
         height: 20,
         width: 20,
         child: CircularProgressIndicator(
           strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.textWhite),
+          valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimary),
         ),
       );
     }

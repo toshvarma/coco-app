@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:coco_app/core/constants/colors.dart';
 
 class CustomCard extends StatelessWidget {
   final Widget child;
@@ -19,16 +18,21 @@ class CustomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     final card = Container(
       padding: padding ?? const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: backgroundColor ?? AppColors.cardBackground,
+        color: backgroundColor ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(
+          color: colorScheme.outline.withOpacity(0.2),
+          width: 1,
+        ),
         boxShadow: hasShadow
             ? [
           BoxShadow(
-            color: AppColors.shadow,
+            color: colorScheme.shadow.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
