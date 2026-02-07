@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
+import 'package:provider/provider.dart';
+import 'package:coco_app/data/services/theme_service.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -26,22 +30,26 @@ class ProfileScreen extends StatelessWidget {
 
             // Edit Personal Information
             _buildSectionCard(
+              context,
               title: 'Personal Information',
               icon: Icons.person_outline,
               items: [
                 _buildMenuItem(
+                  context,
                   icon: Icons.edit_outlined,
                   title: 'Edit Name',
                   subtitle: 'Lena Hoffman',
                   onTap: () => _showEditDialog(context, 'Name'),
                 ),
                 _buildMenuItem(
+                  context,
                   icon: Icons.email_outlined,
                   title: 'Email Address',
                   subtitle: 'Lena Hoffman@outlook.com',
                   onTap: () => _showEditDialog(context, 'Email'),
                 ),
                 _buildMenuItem(
+                  context,
                   icon: Icons.lock_outline,
                   title: 'Change Password',
                   subtitle: '••••••••',
@@ -51,30 +59,39 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
+            // Appearance Settings
+            _buildAppearanceSection(context),
+            const SizedBox(height: 16),
+
             // Connected Platforms
             _buildSectionCard(
+              context,
               title: 'Connected Platforms',
               icon: Icons.link,
               items: [
                 _buildPlatformItem(
+                  context,
                   platform: 'Instagram',
                   isConnected: true,
                   username: '@Lena_Hoffman',
                   color: const Color(0xFFE4405F),
                 ),
                 _buildPlatformItem(
+                  context,
                   platform: 'Facebook',
                   isConnected: true,
                   username: 'Lena Hoffman',
                   color: const Color(0xFF1877F2),
                 ),
                 _buildPlatformItem(
+                  context,
                   platform: 'LinkedIn',
                   isConnected: true,
                   username: 'Lena Hoffman',
                   color: const Color(0xFF0A66C2),
                 ),
                 _buildPlatformItem(
+                  context,
                   platform: 'TikTok',
                   isConnected: false,
                   color: Colors.black,
@@ -89,22 +106,26 @@ class ProfileScreen extends StatelessWidget {
 
             // Help & Support
             _buildSectionCard(
+              context,
               title: 'Help & Support',
               icon: Icons.help_outline,
               items: [
                 _buildMenuItem(
+                  context,
                   icon: Icons.question_answer_outlined,
                   title: 'FAQ',
                   subtitle: 'Frequently asked questions',
                   onTap: () {},
                 ),
                 _buildMenuItem(
+                  context,
                   icon: Icons.support_agent_outlined,
                   title: 'Contact Support',
                   subtitle: 'Get help from our team',
                   onTap: () {},
                 ),
                 _buildMenuItem(
+                  context,
                   icon: Icons.bug_report_outlined,
                   title: 'Report a Problem',
                   subtitle: 'Tell us what went wrong',
@@ -116,20 +137,24 @@ class ProfileScreen extends StatelessWidget {
 
             // Legal & Compliance
             _buildSectionCard(
+              context,
               title: 'Legal & Compliance',
               icon: Icons.gavel_outlined,
               items: [
                 _buildMenuItem(
+                  context,
                   icon: Icons.privacy_tip_outlined,
                   title: 'Privacy Policy',
                   onTap: () {},
                 ),
                 _buildMenuItem(
+                  context,
                   icon: Icons.description_outlined,
                   title: 'Terms of Service',
                   onTap: () {},
                 ),
                 _buildMenuItem(
+                  context,
                   icon: Icons.info_outline,
                   title: 'Imprint',
                   onTap: () {},
@@ -148,6 +173,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildAccountOverview(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -160,15 +187,15 @@ class ProfileScreen extends StatelessWidget {
               shape: BoxShape.circle,
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary,
-                  AppColors.primaryLight,
+                  colorScheme.primary,
+                  colorScheme.primaryContainer,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.3),
+                  color: colorScheme.primary.withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -189,13 +216,15 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   'Ichbin Architekt',
-                  style: AppTextStyles.heading3,
+                  style: AppTextStyles.heading3.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Interior Designer',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -205,13 +234,13 @@ class ProfileScreen extends StatelessWidget {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     'Pro Plan',
                     style: AppTextStyles.caption.copyWith(
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -224,18 +253,17 @@ class ProfileScreen extends StatelessWidget {
           IconButton(
             onPressed: () => _showEditDialog(context, 'Profile'),
             icon: const Icon(Icons.edit_outlined),
-            color: AppColors.primary,
+            color: colorScheme.primary,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSectionCard({
-    required String title,
-    required IconData icon,
-    required List<Widget> items,
-  }) {
+  Widget _buildAppearanceSection(BuildContext context) {
+    final themeService = Provider.of<ThemeService>(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -246,12 +274,104 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.palette_outlined,
+                  color: colorScheme.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Appearance',
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Theme Toggle
+          InkWell(
+            onTap: () => themeService.toggleTheme(),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+              child: Row(
+                children: [
+                  Icon(
+                    themeService.isDarkMode
+                        ? Icons.dark_mode_outlined
+                        : Icons.light_mode_outlined,
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                    size: 22,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Theme',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          themeService.isDarkMode ? 'Dark Mode' : 'Light Mode',
+                          style: AppTextStyles.caption.copyWith(
+                            fontSize: 11,
+                            color: colorScheme.onSurface.withOpacity(0.7),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: themeService.isDarkMode,
+                    onChanged: (_) => themeService.toggleTheme(),
+                    activeColor: colorScheme.primary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard(
+      BuildContext context, {
+        required String title,
+        required IconData icon,
+        required List<Widget> items,
+      }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return CustomCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   icon,
-                  color: AppColors.primary,
+                  color: colorScheme.primary,
                   size: 20,
                 ),
               ),
@@ -261,6 +381,7 @@ class ProfileScreen extends StatelessWidget {
                 style: AppTextStyles.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -272,13 +393,16 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem({
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    required VoidCallback onTap,
-    bool showArrow = true,
-  }) {
+  Widget _buildMenuItem(
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        String? subtitle,
+        required VoidCallback onTap,
+        bool showArrow = true,
+      }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -288,7 +412,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: AppColors.textSecondary,
+              color: colorScheme.onSurface.withOpacity(0.7),
               size: 22,
             ),
             const SizedBox(width: 12),
@@ -300,6 +424,7 @@ class ProfileScreen extends StatelessWidget {
                     title,
                     style: AppTextStyles.bodySmall.copyWith(
                       fontWeight: FontWeight.w500,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   if (subtitle != null) ...[
@@ -308,6 +433,7 @@ class ProfileScreen extends StatelessWidget {
                       subtitle,
                       style: AppTextStyles.caption.copyWith(
                         fontSize: 11,
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -317,7 +443,7 @@ class ProfileScreen extends StatelessWidget {
             if (showArrow)
               Icon(
                 Icons.chevron_right,
-                color: AppColors.textSecondary,
+                color: colorScheme.onSurface.withOpacity(0.5),
                 size: 20,
               ),
           ],
@@ -326,12 +452,15 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlatformItem({
-    required String platform,
-    required bool isConnected,
-    required Color color,
-    String? username,
-  }) {
+  Widget _buildPlatformItem(
+      BuildContext context, {
+        required String platform,
+        required bool isConnected,
+        required Color color,
+        String? username,
+      }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Row(
@@ -357,6 +486,7 @@ class ProfileScreen extends StatelessWidget {
                   platform,
                   style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.w500,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 if (username != null) ...[
@@ -365,6 +495,7 @@ class ProfileScreen extends StatelessWidget {
                     username,
                     style: AppTextStyles.caption.copyWith(
                       fontSize: 11,
+                      color: colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -375,7 +506,7 @@ class ProfileScreen extends StatelessWidget {
             TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
+                foregroundColor: colorScheme.error,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               ),
               child: const Text('Disconnect'),
@@ -384,7 +515,7 @@ class ProfileScreen extends StatelessWidget {
             TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primary,
+                foregroundColor: colorScheme.primary,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               ),
               child: const Text('Connect'),
@@ -395,6 +526,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildSubscriptionCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -405,12 +538,12 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   Icons.workspace_premium_outlined,
-                  color: AppColors.primary,
+                  color: colorScheme.primary,
                   size: 20,
                 ),
               ),
@@ -420,6 +553,7 @@ class ProfileScreen extends StatelessWidget {
                 style: AppTextStyles.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -432,15 +566,15 @@ class ProfileScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  AppColors.primary.withOpacity(0.1),
-                  AppColors.primaryLight.withOpacity(0.05),
+                  colorScheme.primary.withOpacity(0.1),
+                  colorScheme.primaryContainer.withOpacity(0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.3),
+                color: colorScheme.primary.withOpacity(0.3),
               ),
             ),
             child: Column(
@@ -454,7 +588,7 @@ class ProfileScreen extends StatelessWidget {
                         Text(
                           'Pro Plan',
                           style: AppTextStyles.heading3.copyWith(
-                            color: AppColors.primary,
+                            color: colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -462,6 +596,7 @@ class ProfileScreen extends StatelessWidget {
                           '\$29.99/month',
                           style: AppTextStyles.bodySmall.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -472,13 +607,13 @@ class ProfileScreen extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.2),
+                        color: const Color(0xFF5A7D5C).withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         'Active',
                         style: AppTextStyles.caption.copyWith(
-                          color: AppColors.success,
+                          color: const Color(0xFF5A7D5C),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -486,22 +621,23 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                _buildPlanDetail(Icons.check_circle_outline, 'Unlimited posts'),
-                _buildPlanDetail(Icons.check_circle_outline, 'All platforms'),
-                _buildPlanDetail(Icons.check_circle_outline, 'AI assistance'),
+                _buildPlanDetail(context, Icons.check_circle_outline, 'Unlimited posts'),
+                _buildPlanDetail(context, Icons.check_circle_outline, 'All platforms'),
+                _buildPlanDetail(context, Icons.check_circle_outline, 'AI assistance'),
                 const SizedBox(height: 12),
                 Row(
                   children: [
                     Icon(
                       Icons.calendar_today,
                       size: 16,
-                      color: AppColors.textSecondary,
+                      color: colorScheme.onSurface.withOpacity(0.7),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Renews on February 28, 2026',
                       style: AppTextStyles.caption.copyWith(
                         fontSize: 11,
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -517,8 +653,8 @@ class ProfileScreen extends StatelessWidget {
             child: OutlinedButton(
               onPressed: () {},
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: BorderSide(color: AppColors.primary),
+                foregroundColor: colorScheme.primary,
+                side: BorderSide(color: colorScheme.primary),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: const Text('Manage Subscription'),
@@ -529,7 +665,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlanDetail(IconData icon, String text) {
+  Widget _buildPlanDetail(BuildContext context, IconData icon, String text) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -537,12 +675,14 @@ class ProfileScreen extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: AppColors.success,
+            color: const Color(0xFF5A7D5C),
           ),
           const SizedBox(width: 8),
           Text(
             text,
-            style: AppTextStyles.bodySmall,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -550,6 +690,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildLogoutButton(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
@@ -559,7 +701,7 @@ class ProfileScreen extends StatelessWidget {
         icon: const Icon(Icons.logout),
         label: const Text('Log Out'),
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.error,
+          backgroundColor: colorScheme.error,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
@@ -586,6 +728,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, String field) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -606,7 +750,7 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: colorScheme.primary,
             ),
             child: const Text('Save'),
           ),
@@ -616,6 +760,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -632,7 +778,7 @@ class ProfileScreen extends StatelessWidget {
               // TODO: Implement logout logic
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: colorScheme.error,
             ),
             child: const Text('Log Out'),
           ),

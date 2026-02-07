@@ -6,7 +6,6 @@ import 'package:coco_app/domain/models/scheduled_post_model.dart';
 import 'package:coco_app/data/services/post_storage_service.dart';
 import 'package:coco_app/core/widgets/add_post_dialog.dart';
 
-import '../../core/widgets/add_post_dialog.dart';
 
 class CalendarScreenWithNavbar extends StatefulWidget {
   const CalendarScreenWithNavbar({super.key});
@@ -53,7 +52,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Calendar',
               style: AppTextStyles.heading1,
             ),
@@ -297,7 +296,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
           CustomCard(
             child: Column(
               children: [
-                Icon(
+                const Icon(
                   Icons.event_available,
                   color: AppColors.textSecondary,
                   size: 48,
@@ -339,7 +338,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                 label: const Text('Add Another Post'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: BorderSide(color: AppColors.border),
+                  side: const BorderSide(color: AppColors.border),
                 ),
               ),
             ),
@@ -354,7 +353,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'All Scheduled Posts',
           style: AppTextStyles.heading3,
         ),
@@ -442,7 +441,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               ],
               const Spacer(),
               PopupMenuButton<String>(
-                icon: Icon(
+                icon: const Icon(
                   Icons.more_vert,
                   color: AppColors.textSecondary,
                   size: 20,
@@ -493,7 +492,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.note_outlined,
                     size: 14,
                     color: AppColors.textSecondary,
@@ -587,7 +586,7 @@ class CalendarScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Calendar',
           style: AppTextStyles.heading3,
         ),

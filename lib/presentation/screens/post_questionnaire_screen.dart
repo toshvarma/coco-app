@@ -121,7 +121,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'AI-Powered Content',
                   style: TextStyle(
                     fontSize: 18,
@@ -148,7 +148,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
         color: AppColors.primarygreen,
@@ -270,15 +270,15 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
         hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.lightGreen),
+          borderSide: const BorderSide(color: AppColors.lightGreen),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.lightGreen),
+          borderSide: const BorderSide(color: AppColors.lightGreen),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primarygreen, width: 2),
+          borderSide: const BorderSide(color: AppColors.primarygreen, width: 2),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -319,9 +319,9 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
           ),
         )
-            : Row(
+            : const Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(Icons.auto_awesome, size: 20),
             SizedBox(width: 8),
             Text(
@@ -347,12 +347,12 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     try {
       // Prepare the initial context message for AI (hidden from user)
       final contextPrompt = '''
-I'm working on a ${_selectedOccasion.toLowerCase()} post for ${_selectedPlatform}.
+I'm working on a ${_selectedOccasion.toLowerCase()} post for $_selectedPlatform.
 
 Project details: ${_descriptionController.text.trim()}
 
 Please help me create engaging content that:
-- Fits the ${_selectedPlatform} platform style and best practices
+- Fits the $_selectedPlatform platform style and best practices
 - Is appropriate for a ${_selectedOccasion.toLowerCase()}
 - Resonates with my target audience
 - Includes relevant hashtags and call-to-action

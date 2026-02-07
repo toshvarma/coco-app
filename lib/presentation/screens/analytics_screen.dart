@@ -22,7 +22,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Text(
+            const Text(
               'Your Statistics',
               style: AppTextStyles.heading1,
             ),
@@ -94,7 +94,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.trending_up,
             color: AppColors.primary,
             size: 32,
@@ -108,7 +108,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
+          const Text(
             'Followers Growth Rate',
             style: AppTextStyles.caption,
             textAlign: TextAlign.center,
@@ -147,7 +147,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   color: AppColors.success.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.check,
                   color: AppColors.success,
                   size: 16,
@@ -164,7 +164,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 90,
                     height: 90,
                     child: CircularProgressIndicator(
@@ -211,7 +211,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Followers',
             style: AppTextStyles.heading3,
           ),
@@ -310,7 +310,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
+                const Text(
                   'View our feedback and recommendations based on your statistics.',
                   style: AppTextStyles.caption,
                 ),
@@ -324,7 +324,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.arrow_downward,
               color: AppColors.primary,
               size: 20,

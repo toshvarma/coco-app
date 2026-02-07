@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
-import 'package:flutter/material.dart';
 import 'post_questionnaire_screen.dart';
 
 class NewPostScreen extends StatelessWidget {
@@ -39,12 +38,12 @@ class NewPostScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Create New Post',
                 style: AppTextStyles.heading1,
               ),
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'Start your post generation',
                 style: AppTextStyles.bodySmall,
               ),

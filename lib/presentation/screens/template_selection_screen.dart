@@ -170,7 +170,7 @@ Make each version unique and optimized for its specific format. Be creative and 
         final content = endIndex != -1 ? section.substring(0, endIndex) : section;
 
         final nameMatch = RegExp(r'^([^\n]+)').firstMatch(content);
-        final templateName = nameMatch?.group(1)?.trim() ?? 'Template ${i}';
+        final templateName = nameMatch?.group(1)?.trim() ?? 'Template $i';
 
         final captionMatch = RegExp(r'CAPTION:\s*\n(.*?)(?=\n\nHASHTAGS:|$)', dotAll: true).firstMatch(content);
         final caption = captionMatch?.group(1)?.trim() ?? '';
@@ -240,7 +240,7 @@ Make each version unique and optimized for its specific format. Be creative and 
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Text(
+                    child: const Text(
                       '2/2',
                       style: TextStyle(
                         color: AppColors.primarygreen,
@@ -266,7 +266,7 @@ Make each version unique and optimized for its specific format. Be creative and 
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
+          const SizedBox(
             width: 60,
             height: 60,
             child: CircularProgressIndicator(
@@ -275,7 +275,7 @@ Make each version unique and optimized for its specific format. Be creative and 
             ),
           ),
           const SizedBox(height: 24),
-          Text(
+          const Text(
             'COCO is creating your templates...',
             style: TextStyle(
               fontSize: 16,
@@ -387,7 +387,7 @@ Make each version unique and optimized for its specific format. Be creative and 
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [AppColors.primarygreen, AppColors.primarygreen],
               ),
               borderRadius: BorderRadius.circular(12),
@@ -463,9 +463,9 @@ Make each version unique and optimized for its specific format. Be creative and 
                 Container(
                   width: 280,
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: const BorderRadius.only(
+                    borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(24),
                       bottomRight: Radius.circular(24),
                     ),
@@ -553,7 +553,7 @@ Make each version unique and optimized for its specific format. Be creative and 
               const SizedBox(width: 8),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primarygreen,
@@ -590,11 +590,11 @@ ${template.hashtags}
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.check_circle, color: AppColors.primarygreen, size: 28),
-            const SizedBox(width: 12),
-            const Expanded(child: Text('Template Selected!')),
+            SizedBox(width: 12),
+            Expanded(child: Text('Template Selected!')),
           ],
         ),
         content: Column(
@@ -606,10 +606,10 @@ ${template.hashtags}
                 color: AppColors.primarygreen.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(Icons.copy_all, color: AppColors.primarygreen, size: 20),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Content copied to clipboard',
@@ -634,7 +634,7 @@ ${template.hashtags}
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'View Another',
               style: TextStyle(color: AppColors.primarygreen),
             ),

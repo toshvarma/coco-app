@@ -90,7 +90,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 8),
                 DropdownButtonFormField<String>(
-                  value: _selectedPlatform,
+                  initialValue: _selectedPlatform,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -193,7 +193,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                       _isDraft = value ?? false;
                     });
                   },
-                  title: Text(
+                  title: const Text(
                     'Save as draft',
                     style: AppTextStyles.bodySmall,
                   ),
