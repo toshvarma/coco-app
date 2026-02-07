@@ -3,6 +3,7 @@ import '../../core/constants/colors.dart';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'post_creation_chat_screen.dart';
+import 'home_screen.dart';
 
 class PostQuestionnaireScreen extends StatefulWidget {
   const PostQuestionnaireScreen({super.key});
@@ -46,6 +47,15 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+            );
+          },
+        ),
         title: const Text('Create New Post'),
         backgroundColor: AppColors.primarygreen,
         foregroundColor: Colors.white,

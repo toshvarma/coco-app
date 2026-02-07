@@ -5,6 +5,7 @@ import '../../core/constants/colors.dart';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'template_selection_screen.dart';
+import 'home_screen.dart';
 
 class PostCreationChatScreen extends StatefulWidget {
   final String occasion;
@@ -146,6 +147,15 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.close, color: AppColors.background),
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false,
+            );
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -165,11 +175,7 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
         ),
         backgroundColor: AppColors.primarygreen,
         elevation: 0,
-        iconTheme: IconThemeData(
-          color: AppColors.background, // Back arrow same color as background
-        ),
         actions: [
-          // Step counter - 1/2
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Center(
