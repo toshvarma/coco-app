@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../../core/constants/colors.dart';
 import '../../domain/models/chat_message_model.dart';
 import '../../data/services/ai_chat_service.dart';
 import 'post_ready_screen.dart';
@@ -171,7 +169,7 @@ Make each version unique and optimized for its specific format. Be creative and 
         final content = endIndex != -1 ? section.substring(0, endIndex) : section;
 
         final nameMatch = RegExp(r'^([^\n]+)').firstMatch(content);
-        final templateName = nameMatch?.group(1)?.trim() ?? 'Template ${i}';
+        final templateName = nameMatch?.group(1)?.trim() ?? 'Template $i';
 
         final captionMatch = RegExp(r'CAPTION:\s*\n(.*?)(?=\n\nHASHTAGS:|$)', dotAll: true).firstMatch(content);
         final caption = captionMatch?.group(1)?.trim() ?? '';
@@ -214,46 +212,48 @@ Make each version unique and optimized for its specific format. Be creative and 
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: AppColors.primarygreen, // Green background
-          foregroundColor: Colors.white, // White text
-          elevation: 0,
-          title: const Text(
-            'Choose Your Template',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+      backgroundColor: colorScheme.background,
+      appBar: AppBar(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 0,
+        title: Text(
+          'Choose Your Template',
+          style: TextStyle(
+            color: colorScheme.onPrimaryContainer,
+            fontWeight: FontWeight.bold,
           ),
-          iconTheme: const IconThemeData(
-            color: Colors.white, // White back arrow
-          ),
-          actions: [
-            if (!_isLoading && _generatedTemplates.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '2/2',
-                      style: TextStyle(
-                        color: AppColors.primarygreen,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+        ),
+        iconTheme: IconThemeData(
+          color: colorScheme.onPrimaryContainer,
+        ),
+        actions: [
+          if (!_isLoading && _generatedTemplates.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surface,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '2/2',
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
+      ),
       body: _isLoading
           ? _buildLoadingState()
           : _error != null
@@ -263,6 +263,8 @@ Make each version unique and optimized for its specific format. Be creative and 
   }
 
   Widget _buildLoadingState() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -272,7 +274,7 @@ Make each version unique and optimized for its specific format. Be creative and 
             height: 60,
             child: CircularProgressIndicator(
               strokeWidth: 4,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primarygreen),
+              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
             ),
           ),
           const SizedBox(height: 24),
@@ -280,7 +282,7 @@ Make each version unique and optimized for its specific format. Be creative and 
             'COCO is creating your templates...',
             style: TextStyle(
               fontSize: 16,
-              color: AppColors.primarygreen,
+              color: colorScheme.primary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -289,7 +291,7 @@ Make each version unique and optimized for its specific format. Be creative and 
             'This may take a few moments',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
         ],
@@ -298,29 +300,26 @@ Make each version unique and optimized for its specific format. Be creative and 
   }
 
   Widget _buildErrorState() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
+            Icon(Icons.error_outline, size: 64, color: colorScheme.error.withOpacity(0.7)),
             const SizedBox(height: 16),
             Text(
               _error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: colorScheme.onSurface),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: _generateTemplates,
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primarygreen,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
             ),
           ],
         ),
@@ -329,9 +328,10 @@ Make each version unique and optimized for its specific format. Be creative and 
   }
 
   Widget _buildSwipeableTemplates() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children: [
-        // Swipeable templates
         Expanded(
           child: PageView.builder(
             controller: _pageController,
@@ -347,7 +347,6 @@ Make each version unique and optimized for its specific format. Be creative and 
           ),
         ),
 
-        // Fixed button at bottom (doesn't swipe)
         Container(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
           child: SizedBox(
@@ -355,14 +354,6 @@ Make each version unique and optimized for its specific format. Be creative and 
             height: 54,
             child: ElevatedButton(
               onPressed: () => _selectTemplate(_generatedTemplates[_currentPage]),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primarygreen,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
               child: const Text(
                 'Select Template',
                 style: TextStyle(
@@ -377,33 +368,33 @@ Make each version unique and optimized for its specific format. Be creative and 
     );
   }
 
-
   Widget _buildTemplatePage(GeneratedTemplate template) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Template name header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.primarygreen, AppColors.primarygreen],
+                colors: [colorScheme.primary, colorScheme.primary],
               ),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(template.type.icon, color: Colors.white, size: 20),
+                Icon(template.type.icon, color: colorScheme.onPrimary, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   template.type.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
               ],
@@ -412,11 +403,10 @@ Make each version unique and optimized for its specific format. Be creative and 
 
           const SizedBox(height: 24),
 
-          // Phone mockup with portrait image placeholder
           Container(
             width: 280,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
@@ -428,12 +418,11 @@ Make each version unique and optimized for its specific format. Be creative and 
             ),
             child: Column(
               children: [
-                // Portrait image placeholder
                 Container(
                   width: 280,
                   height: 400,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    color: colorScheme.surfaceVariant,
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(24),
                       topRight: Radius.circular(24),
@@ -445,14 +434,14 @@ Make each version unique and optimized for its specific format. Be creative and 
                       Icon(
                         Icons.image_outlined,
                         size: 80,
-                        color: Colors.grey[400],
+                        color: colorScheme.onSurface.withOpacity(0.3),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'Post Preview',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey[600],
+                          color: colorScheme.onSurface.withOpacity(0.6),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -460,12 +449,11 @@ Make each version unique and optimized for its specific format. Be creative and 
                   ),
                 ),
 
-                // Caption and hashtags
                 Container(
                   width: 280,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colorScheme.surface,
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(24),
                       bottomRight: Radius.circular(24),
@@ -474,13 +462,12 @@ Make each version unique and optimized for its specific format. Be creative and 
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Caption
                       if (template.caption.isNotEmpty) ...[
                         Text(
                           template.caption,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black87,
+                            color: colorScheme.onSurface,
                             height: 1.4,
                           ),
                           maxLines: 4,
@@ -489,13 +476,12 @@ Make each version unique and optimized for its specific format. Be creative and 
                         const SizedBox(height: 12),
                       ],
 
-                      // Hashtags
                       if (template.hashtags.isNotEmpty)
                         Text(
                           template.hashtags,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.blue[700],
+                            color: colorScheme.primary,
                             height: 1.3,
                           ),
                           maxLines: 2,
@@ -510,7 +496,6 @@ Make each version unique and optimized for its specific format. Be creative and 
 
           const SizedBox(height: 16),
 
-          // Swipe indicators (dots) - underneath preview
           if (_generatedTemplates.length > 1)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -522,55 +507,13 @@ Make each version unique and optimized for its specific format. Be creative and 
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index
-                        ? AppColors.primarygreen
-                        : Colors.grey[300],
+                        ? colorScheme.primary
+                        : colorScheme.onSurface.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
               ),
             ),
-
-          // Remove Spacer and button from here - they're now fixed at bottom
-        ],
-      ),
-    );
-  }
-
-  Widget _buildContentSection(String title, IconData icon, String content, {Color? textColor}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 18, color: AppColors.primarygreen),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primarygreen,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            content,
-            style: TextStyle(
-              fontSize: 15,
-              color: textColor ?? Colors.black87,
-              height: 1.5,
-            ),
-          ),
         ],
       ),
     );
