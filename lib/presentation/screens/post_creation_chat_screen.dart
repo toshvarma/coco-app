@@ -496,7 +496,7 @@ class _ChatBubble extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Response #$messageNumber',
+                        'COCOs Response #$messageNumber',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
