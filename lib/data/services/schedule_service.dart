@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../../domain/models/scheduled_post_model.dart';
 
 class ScheduleService {
-  static const String _baseUrl = 'http://localhost:3000/api/posts'; // Change for mobile: http://10.0.2.2:3000/api/posts
+  static const String _baseUrl = 'http://10.0.2.2:3000/api/posts'; // Change for mobile: http://10.0.2.2:3000/api/posts
 
   // Schedule a post
   Future<bool> schedulePost(ScheduledPost post) async {
