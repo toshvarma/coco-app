@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/colors.dart';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-
-
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -48,13 +45,11 @@ class _ChatScreenState extends State<ChatScreen> {
       _isLoading = true;
     });
 
-    // Auto-scroll to bottom
     _scrollToBottom();
 
     try {
-      // Convert messages to API format (excluding welcome message)
       final chatHistory = _messages
-          .skip(1) // Skip welcome message
+          .skip(1)
           .map((msg) => msg.toApiFormat())
           .toList();
 
@@ -99,12 +94,14 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         title: const Text('AI Chat Assistant'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         elevation: 0,
       ),
       body: Column(
@@ -116,7 +113,10 @@ class _ChatScreenState extends State<ChatScreen> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                return _ChatBubble(message: message, onCopy: () {  },);
+                return _ChatBubble(
+                  message: message,
+                  onCopy: () {},
+                );
               },
             ),
           ),
@@ -131,14 +131,14 @@ class _ChatScreenState extends State<ChatScreen> {
                     height: 20,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     'COCO is typing...',
                     style: TextStyle(
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                       fontSize: 14,
                     ),
                   ),
@@ -152,10 +152,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildMessageInput() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -171,22 +173,22 @@ class _ChatScreenState extends State<ChatScreen> {
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: 'Ask me anything...',
-                hintStyle: TextStyle(color: Colors.grey[400]),
+                hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.5)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.lightGreen),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.lightGreen),
+                  borderSide: BorderSide(color: colorScheme.outline),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: colorScheme.background,
               ),
               onSubmitted: (_) => _sendMessage(),
               maxLines: null,
@@ -197,14 +199,14 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.primary, AppColors.primary],
+                colors: [colorScheme.primary, colorScheme.primary],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.send_rounded, color: Colors.white),
+              icon: Icon(Icons.send_rounded, color: colorScheme.onPrimary),
               onPressed: _sendMessage,
             ),
           ),
@@ -232,6 +234,8 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: GestureDetector(
@@ -243,7 +247,7 @@ class _ChatBubble extends StatelessWidget {
             maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
           decoration: BoxDecoration(
-            color: message.isUser ? AppColors.primarygreen : Colors.white,
+            color: message.isUser ? colorScheme.primaryContainer : colorScheme.surface,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(20),
               topRight: const Radius.circular(20),
@@ -261,12 +265,11 @@ class _ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Use Markdown for AI messages, plain text for user messages
               if (message.isUser)
                 Text(
                   message.content,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: colorScheme.onPrimaryContainer,
                     fontSize: 15,
                     height: 1.4,
                   ),
@@ -275,59 +278,59 @@ class _ChatBubble extends StatelessWidget {
                 MarkdownBody(
                   data: message.content,
                   styleSheet: MarkdownStyleSheet(
-                    p: const TextStyle(
-                      color: Colors.black87,
+                    p: TextStyle(
+                      color: colorScheme.onSurface,
                       fontSize: 15,
                       height: 1.4,
                     ),
                     strong: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
-                    em: const TextStyle(
+                    em: TextStyle(
                       fontStyle: FontStyle.italic,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                     listBullet: TextStyle(
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                       fontSize: 15,
                     ),
                     code: TextStyle(
-                      backgroundColor: AppColors.background,
-                      color: AppColors.primarygreen,
+                      backgroundColor: colorScheme.background,
+                      color: colorScheme.primary,
                       fontFamily: 'monospace',
                     ),
                     h1: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
                     h2: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
                     h3: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.primarygreen,
+                      color: colorScheme.primary,
                     ),
                     blockquote: TextStyle(
-                      color: Colors.grey[700],
+                      color: colorScheme.onSurface.withOpacity(0.7),
                       fontStyle: FontStyle.italic,
                     ),
                     blockquoteDecoration: BoxDecoration(
-                      color: AppColors.background,
+                      color: colorScheme.background,
                       borderRadius: BorderRadius.circular(4),
                       border: Border(
                         left: BorderSide(
-                          color: AppColors.primarygreen,
+                          color: colorScheme.primary,
                           width: 3,
                         ),
                       ),
                     ),
                   ),
-                  selectable: true, // Allows user to select and copy text
+                  selectable: true,
                 ),
               if (!message.isUser)
                 Padding(
@@ -336,7 +339,7 @@ class _ChatBubble extends StatelessWidget {
                     'Long press to copy',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey[500],
+                      color: colorScheme.onSurface.withOpacity(0.5),
                       fontStyle: FontStyle.italic,
                     ),
                   ),

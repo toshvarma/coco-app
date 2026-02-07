@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
 
@@ -15,6 +14,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -59,19 +60,21 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildPlatformSelector() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.cardBackground,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
       ),
       child: DropdownButton<String>(
         value: selectedPlatform,
         isExpanded: true,
         underline: const SizedBox(),
         icon: const Icon(Icons.keyboard_arrow_down),
-        style: AppTextStyles.body,
+        style: AppTextStyles.body.copyWith(color: colorScheme.onSurface),
         items: ['Instagram', 'Facebook', 'LinkedIn', 'TikTok']
             .map((platform) => DropdownMenuItem(
           value: platform,
@@ -90,13 +93,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildGrowthRateCard() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           Icon(
             Icons.trending_up,
-            color: AppColors.primary,
+            color: colorScheme.primary,
             size: 32,
           ),
           const SizedBox(height: 12),
@@ -104,13 +109,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             '3.80%',
             style: AppTextStyles.heading1.copyWith(
               fontSize: 28,
-              color: AppColors.primary,
+              color: colorScheme.primary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Followers Growth Rate',
-            style: AppTextStyles.caption,
+            style: AppTextStyles.caption.copyWith(
+              color: colorScheme.onSurface.withOpacity(0.7),
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -118,6 +125,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             "That's a 17% increase from last week!",
             style: AppTextStyles.caption.copyWith(
               fontSize: 11,
+              color: colorScheme.onSurface.withOpacity(0.6),
             ),
             textAlign: TextAlign.center,
           ),
@@ -127,6 +135,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildLatestPostCard() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -139,17 +149,18 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 'Latest Post',
                 style: AppTextStyles.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.1),
+                  color: colorScheme.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.check,
-                  color: AppColors.success,
+                  color: colorScheme.primary,
                   size: 16,
                 ),
               ),
@@ -170,9 +181,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     child: CircularProgressIndicator(
                       value: 0.65,
                       strokeWidth: 8,
-                      backgroundColor: AppColors.border,
+                      backgroundColor: colorScheme.outline.withOpacity(0.2),
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.primary,
+                        colorScheme.primary,
                       ),
                     ),
                   ),
@@ -183,7 +194,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         'Views',
                         style: AppTextStyles.caption.copyWith(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: colorScheme.onSurface.withOpacity(0.7),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -192,6 +203,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                         style: AppTextStyles.bodySmall.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -206,6 +218,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildFollowersChart() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -213,7 +227,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         children: [
           Text(
             'Followers',
-            style: AppTextStyles.heading3,
+            style: AppTextStyles.heading3.copyWith(
+              color: colorScheme.onSurface,
+            ),
           ),
           const SizedBox(height: 24),
 
@@ -249,7 +265,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   top: 0,
                   bottom: 20,
                   child: CustomPaint(
-                    painter: LineChartPainter(),
+                    painter: LineChartPainter(
+                      primaryColor: colorScheme.primary,
+                      surfaceColor: colorScheme.surface,
+                      borderColor: colorScheme.outline.withOpacity(0.3),
+                    ),
                   ),
                 ),
               ],
@@ -279,23 +299,35 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildYAxisLabel(String text) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: Text(
         text,
-        style: AppTextStyles.caption.copyWith(fontSize: 10),
+        style: AppTextStyles.caption.copyWith(
+          fontSize: 10,
+          color: colorScheme.onSurface.withOpacity(0.6),
+        ),
       ),
     );
   }
 
   Widget _buildXAxisLabel(String text) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Text(
       text,
-      style: AppTextStyles.caption.copyWith(fontSize: 10),
+      style: AppTextStyles.caption.copyWith(
+        fontSize: 10,
+        color: colorScheme.onSurface.withOpacity(0.6),
+      ),
     );
   }
 
   Widget _buildConvertCard() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       child: Row(
         children: [
@@ -307,12 +339,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   "Let's convert this to more value",
                   style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'View our feedback and recommendations based on your statistics.',
-                  style: AppTextStyles.caption,
+                  style: AppTextStyles.caption.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -321,12 +356,12 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: colorScheme.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               Icons.arrow_downward,
-              color: AppColors.primary,
+              color: colorScheme.primary,
               size: 20,
             ),
           ),
@@ -338,10 +373,20 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
 // Custom painter for the line chart
 class LineChartPainter extends CustomPainter {
+  final Color primaryColor;
+  final Color surfaceColor;
+  final Color borderColor;
+
+  LineChartPainter({
+    required this.primaryColor,
+    required this.surfaceColor,
+    required this.borderColor,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.primary
+      ..color = primaryColor
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
@@ -387,11 +432,11 @@ class LineChartPainter extends CustomPainter {
 
     // Draw dots at data points
     final dotPaint = Paint()
-      ..color = AppColors.primary
+      ..color = primaryColor
       ..style = PaintingStyle.fill;
 
     final dotBorderPaint = Paint()
-      ..color = AppColors.cardBackground
+      ..color = surfaceColor
       ..style = PaintingStyle.fill;
 
     for (final point in points) {
@@ -401,7 +446,7 @@ class LineChartPainter extends CustomPainter {
 
     // Draw horizontal grid lines
     final gridPaint = Paint()
-      ..color = AppColors.border.withOpacity(0.3)
+      ..color = borderColor
       ..strokeWidth = 1;
 
     for (int i = 0; i <= 6; i++) {

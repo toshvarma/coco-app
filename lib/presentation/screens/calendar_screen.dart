@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
 import 'package:coco_app/domain/models/scheduled_post_model.dart';
 import 'package:coco_app/data/services/post_storage_service.dart';
 import 'package:coco_app/core/widgets/add_post_dialog.dart';
-
-import '../../core/widgets/add_post_dialog.dart';
 
 class CalendarScreenWithNavbar extends StatefulWidget {
   const CalendarScreenWithNavbar({super.key});
@@ -41,9 +38,13 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
+      return Center(
+        child: CircularProgressIndicator(
+          color: colorScheme.primary,
+        ),
       );
     }
 
@@ -60,7 +61,9 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             const SizedBox(height: 4),
             Text(
               'January $currentYear • Today: 28 Jan',
-              style: AppTextStyles.bodySmall,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -120,11 +123,13 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
       case 'tiktok':
         return Colors.black;
       default:
-        return AppColors.primary;
+        return Theme.of(context).colorScheme.primary;
     }
   }
 
   Widget _buildCalendarCard() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return CustomCard(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -133,17 +138,20 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.chevron_left, color: AppColors.textPrimary),
+                icon: Icon(Icons.chevron_left, color: colorScheme.onSurface),
                 onPressed: () {
                   // TODO: Previous month
                 },
               ),
               Text(
                 'January $currentYear',
-                style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: colorScheme.onSurface,
+                ),
               ),
               IconButton(
-                icon: const Icon(Icons.chevron_right, color: AppColors.textPrimary),
+                icon: Icon(Icons.chevron_right, color: colorScheme.onSurface),
                 onPressed: () {
                   // TODO: Next month
                 },
@@ -163,7 +171,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                   day,
                   style: AppTextStyles.caption.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
               ),
@@ -188,6 +196,8 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   }
 
   Widget _buildWeekRow(List<int?> days) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -213,13 +223,13 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               height: 40,
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.primary
+                    ? colorScheme.primary
                     : isToday
-                    ? AppColors.primary.withOpacity(0.2)
+                    ? colorScheme.primary.withOpacity(0.2)
                     : Colors.transparent,
                 shape: BoxShape.circle,
                 border: isToday && !isSelected
-                    ? Border.all(color: AppColors.primary, width: 2)
+                    ? Border.all(color: colorScheme.primary, width: 2)
                     : null,
               ),
               child: Stack(
@@ -229,8 +239,8 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                     day.toString(),
                     style: AppTextStyles.bodySmall.copyWith(
                       color: isSelected
-                          ? AppColors.textWhite
-                          : AppColors.textPrimary,
+                          ? colorScheme.onPrimary
+                          : colorScheme.onSurface,
                       fontWeight: isToday || hasPosts
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -264,6 +274,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   }
 
   Widget _buildSelectedDayDetails() {
+    final colorScheme = Theme.of(context).colorScheme;
     final posts = scheduledPosts[selectedDay] ?? [];
 
     return Column(
@@ -274,7 +285,9 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
           children: [
             Text(
               'January $selectedDay, $currentYear',
-              style: AppTextStyles.heading3,
+              style: AppTextStyles.heading3.copyWith(
+                color: colorScheme.onSurface,
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -285,7 +298,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               child: Text(
                 'View All',
                 style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.primary,
+                  color: colorScheme.primary,
                 ),
               ),
             ),
@@ -299,14 +312,14 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               children: [
                 Icon(
                   Icons.event_available,
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurface.withOpacity(0.5),
                   size: 48,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'No posts scheduled',
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -314,10 +327,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                   onPressed: () => _showAddPostDialog(selectedDay!),
                   icon: const Icon(Icons.add),
                   label: const Text('Add Post'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textWhite,
-                  ),
                 ),
               ],
             ),
@@ -337,10 +346,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                 onPressed: () => _showAddPostDialog(selectedDay!),
                 icon: const Icon(Icons.add),
                 label: const Text('Add Another Post'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                  side: BorderSide(color: AppColors.border),
-                ),
               ),
             ),
           ),
@@ -349,6 +354,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   }
 
   Widget _buildAllScheduledPosts() {
+    final colorScheme = Theme.of(context).colorScheme;
     final allDays = scheduledPosts.keys.toList()..sort();
 
     return Column(
@@ -356,7 +362,9 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
       children: [
         Text(
           'All Scheduled Posts',
-          style: AppTextStyles.heading3,
+          style: AppTextStyles.heading3.copyWith(
+            color: colorScheme.onSurface,
+          ),
         ),
         const SizedBox(height: 12),
 
@@ -371,7 +379,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                   'January $day, $currentYear',
                   style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
               ),
@@ -387,6 +395,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   }
 
   Widget _buildPostCard(ScheduledPost post, int day) {
+    final colorScheme = Theme.of(context).colorScheme;
     final platformColor = _getPlatformColor(post.platform);
 
     return CustomCard(
@@ -428,13 +437,13 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.warning.withOpacity(0.1),
+                    color: const Color(0xFFF59E0B).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     'Draft',
                     style: AppTextStyles.caption.copyWith(
-                      color: AppColors.warning,
+                      color: const Color(0xFFF59E0B),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -444,7 +453,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               PopupMenuButton<String>(
                 icon: Icon(
                   Icons.more_vert,
-                  color: AppColors.textSecondary,
+                  color: colorScheme.onSurface.withOpacity(0.7),
                   size: 20,
                 ),
                 onSelected: (value) async {
@@ -472,6 +481,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             post.topic,
             style: AppTextStyles.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
             ),
           ),
           if (post.time != null) ...[
@@ -479,7 +489,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             Text(
               'Time: ${post.time}',
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.primary,
+                color: colorScheme.primary,
               ),
             ),
           ],
@@ -488,7 +498,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.background,
+                color: colorScheme.background,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Row(
@@ -496,13 +506,15 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                   Icon(
                     Icons.note_outlined,
                     size: 14,
-                    color: AppColors.textSecondary,
+                    color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       post.note!,
-                      style: AppTextStyles.caption,
+                      style: AppTextStyles.caption.copyWith(
+                        color: colorScheme.onSurface.withOpacity(0.8),
+                      ),
                     ),
                   ),
                 ],
@@ -544,6 +556,8 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   }
 
   Future<void> _deletePost(ScheduledPost post) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -557,7 +571,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
+              foregroundColor: colorScheme.error,
             ),
             child: const Text('Delete'),
           ),
@@ -578,13 +592,15 @@ class CalendarScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(

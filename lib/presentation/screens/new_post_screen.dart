@@ -1,65 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:coco_app/core/constants/colors.dart';
-import 'package:coco_app/core/constants/text_styles.dart';
-import 'package:flutter/material.dart';
 import 'post_questionnaire_screen.dart';
 
 class NewPostScreen extends StatelessWidget {
   const NewPostScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
-  // Immediately navigate to questionnaire
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-  Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-  builder: (context) => const PostQuestionnaireScreen(),
-  ),
-  );
-  });
+    final colorScheme = Theme.of(context).colorScheme;
 
-  // Show loading while navigating
-  return const Scaffold(
-  body: Center(
-  child: CircularProgressIndicator(),
-  ),
-  );
-  }
-  }
+    // Immediately navigate to questionnaire
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PostQuestionnaireScreen(),
+        ),
+      );
+    });
 
-  @override
-  Widget build(BuildContext context) {
+    // Show loading while navigating
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Create New Post',
-                style: AppTextStyles.heading1,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Start your post generation',
-                style: AppTextStyles.bodySmall,
-              ),
-              const SizedBox(height: 40),
-              Center(
-                child: Text(
-                  'Post generation coming soon...',
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ],
-          ),
+      backgroundColor: colorScheme.background,
+      body: Center(
+        child: CircularProgressIndicator(
+          color: colorScheme.primary,
         ),
       ),
     );
   }
+}
