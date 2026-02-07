@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';  // Add this
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../core/constants/colors.dart';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
+import 'template_selection_screen.dart';
 
 class PostCreationChatScreen extends StatefulWidget {
   final String occasion;
@@ -46,6 +47,19 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
 
     // Scroll to bottom after build
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  }
+
+  void _navigateToTemplates() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TemplateSelectionScreen(
+          platform: widget.platform,
+          occasion: widget.occasion,
+          chatHistory: _messages,
+        ),
+      ),
+    );
   }
 
   Future<void> _sendMessage() async {
@@ -146,11 +160,17 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
+          TextButton.icon(
+            onPressed: _navigateToTemplates,
+            icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+            label: const Text(
+              'Templates',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              _showProjectInfo();
-            },
+            onPressed: _showProjectInfo,
           ),
         ],
       ),
@@ -459,7 +479,7 @@ class _ChatBubble extends StatelessWidget {
                       ),
                     ),
                   ),
-                  selectable: true, // Allows user to select and copy text
+                  selectable: true,
                 ),
               if (!message.isUser)
                 Padding(
