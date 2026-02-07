@@ -186,7 +186,7 @@ class DashboardScreen extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppColors.primary,
-            AppColors.primaryDark,
+            AppColors.primarygreen,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

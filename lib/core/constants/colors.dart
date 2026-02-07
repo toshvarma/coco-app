@@ -4,7 +4,7 @@ class AppColors {
   // Primary Brand Colors (from COCO palette)
   static const Color primary = Color(0xFF5A7D5C);        // Medium green from palette
   static const Color primaryLight = Color(0xFF8FA891);   // Light green
-  static const Color primaryDark = Color(0xFF3D5A3F);    // Dark green
+  static const Color primarygreen = Color(0xFF3D5A3F);    // Dark green
 
   // Accent Colors
   static const Color accent = Color(0xFFB8D4A8);         // Light mint green

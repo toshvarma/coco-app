@@ -1,9 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/colors.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
+import 'package:flutter/material.dart';
+import 'post_questionnaire_screen.dart';
 
 class NewPostScreen extends StatelessWidget {
   const NewPostScreen({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+  // Immediately navigate to questionnaire
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+  Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+  builder: (context) => const PostQuestionnaireScreen(),
+  ),
+  );
+  });
+
+  // Show loading while navigating
+  return const Scaffold(
+  body: Center(
+  child: CircularProgressIndicator(),
+  ),
+  );
+  }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,4 +63,3 @@ class NewPostScreen extends StatelessWidget {
       ),
     );
   }
-}
