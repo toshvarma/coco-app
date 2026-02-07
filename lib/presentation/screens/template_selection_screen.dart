@@ -343,33 +343,10 @@ Make each version unique and optimized for its specific format. Be creative and 
           },
         ),
 
-        // Swipe indicators
-        if (_generatedTemplates.length > 1)
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _generatedTemplates.length,
-                    (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? AppColors.primarygreen
-                        : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }
+
 
   Widget _buildTemplatePage(GeneratedTemplate template) {
     return Padding(
@@ -400,29 +377,6 @@ Make each version unique and optimized for its specific format. Be creative and 
                   ),
                 ),
               ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Page counter - bigger and below badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primarygreen.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: AppColors.primarygreen.withOpacity(0.3),
-                width: 1.5,
-              ),
-            ),
-            child: Text(
-              '${_currentPage + 1} of ${_generatedTemplates.length}',
-              style: TextStyle(
-                color: AppColors.primarygreen,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
             ),
           ),
 
@@ -523,6 +477,28 @@ Make each version unique and optimized for its specific format. Be creative and 
               ],
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          // Swipe indicators (dots) - underneath preview
+          if (_generatedTemplates.length > 1)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _generatedTemplates.length,
+                    (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentPage == index ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == index
+                        ? AppColors.primarygreen
+                        : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
 
           const Spacer(),
 
