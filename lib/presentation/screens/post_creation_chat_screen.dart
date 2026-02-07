@@ -149,28 +149,46 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('AI Content Creator'),
+            Text(
+              'AI Content Creator',
+              style: TextStyle(color: AppColors.background),
+            ),
             Text(
               '${widget.platform} • ${widget.occasion}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                color: AppColors.background.withOpacity(0.9),
+              ),
             ),
           ],
         ),
         backgroundColor: AppColors.primarygreen,
-        foregroundColor: Colors.white,
         elevation: 0,
+        iconTheme: IconThemeData(
+          color: AppColors.background, // Back arrow same color as background
+        ),
         actions: [
-          TextButton.icon(
-            onPressed: _navigateToTemplates,
-            icon: const Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-            label: const Text(
-              'Templates',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          // Step counter - 1/2
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '1/2',
+                  style: TextStyle(
+                    color: AppColors.primarygreen,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: _showProjectInfo,
           ),
         ],
       ),
@@ -187,9 +205,20 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
+
+                // Calculate AI message number (only count AI responses)
+                int? aiMessageNumber;
+                if (!message.isUser) {
+                  aiMessageNumber = _messages
+                      .take(index + 1)
+                      .where((m) => !m.isUser)
+                      .length;
+                }
+
                 return _ChatBubble(
                   message: message,
                   onCopy: () => _copyMessage(message.content),
+                  messageNumber: aiMessageNumber,
                 );
               },
             ),
@@ -221,6 +250,40 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               ),
             ),
 
+          // Templates button (above message input)
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border(
+                top: BorderSide(color: Colors.grey[200]!),
+              ),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: _navigateToTemplates,
+                icon: Icon(Icons.dashboard_customize, color: AppColors.primarygreen, size: 20),
+                label: Text(
+                  'Choose Template',
+                  style: TextStyle(
+                    color: AppColors.primarygreen,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.primarygreen, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Message input
           _buildMessageInput(),
         ],
       ),
@@ -376,10 +439,12 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
 class _ChatBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback onCopy;
+  final int? messageNumber; // Add this parameter
 
   const _ChatBubble({
     required this.message,
     required this.onCopy,
+    this.messageNumber, // Add this
   });
 
   @override
@@ -413,7 +478,38 @@ class _ChatBubble extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Use Markdown for AI messages, plain text for user messages
+              // Message number for AI responses
+              if (!message.isUser && messageNumber != null) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarygreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
+                        size: 12,
+                        color: AppColors.primarygreen,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Response #$messageNumber',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primarygreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+
+              // Message content
               if (message.isUser)
                 Text(
                   message.content,
