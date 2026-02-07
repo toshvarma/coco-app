@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/colors.dart';
+import '../../data/services/schedule_service.dart';
+import '../../domain/models/scheduled_post_model.dart';
 
 class PostReadyScreen extends StatelessWidget {
   final String platform;
@@ -16,10 +19,16 @@ class PostReadyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
-      backgroundColor: colorScheme.primary,
+      backgroundColor: AppColors.primarygreen,
+      appBar: AppBar(
+        backgroundColor: AppColors.primarygreen,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -31,25 +40,25 @@ class PostReadyScreen extends StatelessWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary,
+                    color: AppColors.primarygreen,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.check,
                     size: 60,
-                    color: colorScheme.onPrimary,
+                    color: Colors.white,
                   ),
                 ),
 
                 const SizedBox(height: 32),
 
-                Text(
+                const Text(
                   'Your post is ready\nand waiting',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onPrimary,
+                    color: Colors.white,
                     height: 1.3,
                   ),
                 ),
@@ -64,13 +73,13 @@ class PostReadyScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: const Text('Post confirmed!'),
-                          backgroundColor: colorScheme.primary,
+                          backgroundColor: AppColors.primarygreen,
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.secondaryContainer,
-                      foregroundColor: colorScheme.primary,
+                      backgroundColor: AppColors.lightGreen,
+                      foregroundColor: AppColors.primarygreen,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
@@ -88,25 +97,11 @@ class PostReadyScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 TextButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Schedule Post'),
-                        content: const Text('Feature coming soon!'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  child: Text(
+                  onPressed: () => _showScheduleDialog(context),
+                  child: const Text(
                     'or schedule for later',
                     style: TextStyle(
-                      color: colorScheme.onPrimary,
+                      color: Colors.white,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -114,19 +109,19 @@ class PostReadyScreen extends StatelessWidget {
 
                 const SizedBox(height: 60),
 
-                Text(
+                const Text(
                   'Want to change something?',
-                  style: TextStyle(color: colorScheme.onPrimary.withOpacity(0.7)),
+                  style: TextStyle(color: Colors.white70),
                 ),
 
                 const SizedBox(height: 8),
 
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(
+                  child: const Text(
                     'Go Back',
                     style: TextStyle(
-                      color: colorScheme.onPrimary,
+                      color: Colors.white,
                       fontWeight: FontWeight.w600,
                       decoration: TextDecoration.underline,
                     ),
@@ -138,5 +133,133 @@ class PostReadyScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showScheduleDialog(BuildContext context) {
+    DateTime selectedDate = DateTime.now();
+    TimeOfDay selectedTime = TimeOfDay(hour: 12, minute: 0);
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Icon(Icons.schedule, color: AppColors.primarygreen),
+                const SizedBox(width: 12),
+                const Text('Schedule Post'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.calendar_today, color: AppColors.primarygreen),
+                  title: const Text('Date'),
+                  subtitle: Text(
+                    '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                    style: TextStyle(
+                      color: AppColors.primarygreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    final DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate,
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                    );
+                    if (picked != null) {
+                      setState(() => selectedDate = picked);
+                    }
+                  },
+                ),
+
+                ListTile(
+                  leading: Icon(Icons.access_time, color: AppColors.primarygreen),
+                  title: const Text('Time'),
+                  subtitle: Text(
+                    '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(
+                      color: AppColors.primarygreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: () async {
+                    final TimeOfDay? picked = await showTimePicker(
+                      context: context,
+                      initialTime: selectedTime,
+                    );
+                    if (picked != null) {
+                      setState(() => selectedTime = picked);
+                    }
+                  },
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _schedulePost(context, selectedDate, selectedTime);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primarygreen,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Schedule'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _schedulePost(BuildContext context, DateTime date, TimeOfDay time) async {
+    final scheduleService = ScheduleService();
+
+    final post = ScheduledPost(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      platform: platform,
+      topic: templateName,
+      note: caption,
+      isDraft: false,
+      date: date,
+      time: '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+    );
+
+    final success = await scheduleService.schedulePost(post);
+
+    if (!context.mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: const [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Text('Post scheduled successfully!'),
+            ],
+          ),
+          backgroundColor: AppColors.primarygreen,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to schedule post'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

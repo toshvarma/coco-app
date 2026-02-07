@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
 import 'package:coco_app/domain/models/scheduled_post_model.dart';
-import 'package:coco_app/data/services/post_storage_service.dart';
+import 'package:coco_app/data/services/schedule_service.dart';
 import 'package:coco_app/core/widgets/add_post_dialog.dart';
 
 class CalendarScreenWithNavbar extends StatefulWidget {
@@ -13,13 +13,13 @@ class CalendarScreenWithNavbar extends StatefulWidget {
 }
 
 class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
-  final PostStorageService _storageService = PostStorageService();
+  final ScheduleService _scheduleService = ScheduleService(); // Changed from PostStorageService
   int? selectedDay;
   Map<int, List<ScheduledPost>> scheduledPosts = {};
   bool isLoading = true;
 
   int currentYear = 2026;
-  int currentMonth = 1;
+  int currentMonth = 2; // February
 
   @override
   void initState() {
@@ -29,9 +29,26 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
 
   Future<void> _loadPosts() async {
     setState(() => isLoading = true);
-    final posts = await _storageService.getPostsForMonth(currentYear, currentMonth);
+
+    // Fetch all posts from backend
+    final allPosts = await _scheduleService.getAllScheduledPosts();
+
+    // Group posts by day for current month
+    final Map<int, List<ScheduledPost>> groupedPosts = {};
+
+    for (var post in allPosts) {
+      // Only include posts from current month/year
+      if (post.date.year == currentYear && post.date.month == currentMonth) {
+        final day = post.date.day;
+        if (!groupedPosts.containsKey(day)) {
+          groupedPosts[day] = [];
+        }
+        groupedPosts[day]!.add(post);
+      }
+    }
+
     setState(() {
-      scheduledPosts = posts;
+      scheduledPosts = groupedPosts;
       isLoading = false;
     });
   }
@@ -60,7 +77,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             ),
             const SizedBox(height: 4),
             Text(
-              'January $currentYear • Today: 28 Jan',
+              '${_getMonthName(currentMonth)} $currentYear • Today: ${DateTime.now().day} ${_getMonthName(DateTime.now().month)}',
               style: AppTextStyles.bodySmall.copyWith(
                 color: colorScheme.onSurface.withOpacity(0.7),
               ),
@@ -84,6 +101,14 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     );
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      '', 'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month];
+  }
+
   Widget _buildPlatformLegend() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -91,6 +116,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         _buildLegendItem('Instagram', _getPlatformColor('Instagram')),
         _buildLegendItem('Facebook', _getPlatformColor('Facebook')),
         _buildLegendItem('LinkedIn', _getPlatformColor('LinkedIn')),
+        _buildLegendItem('TikTok', _getPlatformColor('TikTok')),
       ],
     );
   }
@@ -129,6 +155,8 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
 
   Widget _buildCalendarCard() {
     final colorScheme = Theme.of(context).colorScheme;
+    final daysInMonth = DateTime(currentYear, currentMonth + 1, 0).day;
+    final firstWeekday = DateTime(currentYear, currentMonth, 1).weekday;
 
     return CustomCard(
       padding: const EdgeInsets.all(16),
@@ -140,11 +168,19 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               IconButton(
                 icon: Icon(Icons.chevron_left, color: colorScheme.onSurface),
                 onPressed: () {
-                  // TODO: Previous month
+                  setState(() {
+                    if (currentMonth == 1) {
+                      currentMonth = 12;
+                      currentYear--;
+                    } else {
+                      currentMonth--;
+                    }
+                  });
+                  _loadPosts();
                 },
               ),
               Text(
-                'January $currentYear',
+                '${_getMonthName(currentMonth)} $currentYear',
                 style: AppTextStyles.bodySmall.copyWith(
                   fontWeight: FontWeight.w600,
                   color: colorScheme.onSurface,
@@ -153,7 +189,15 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               IconButton(
                 icon: Icon(Icons.chevron_right, color: colorScheme.onSurface),
                 onPressed: () {
-                  // TODO: Next month
+                  setState(() {
+                    if (currentMonth == 12) {
+                      currentMonth = 1;
+                      currentYear++;
+                    } else {
+                      currentMonth++;
+                    }
+                  });
+                  _loadPosts();
                 },
               ),
             ],
@@ -181,22 +225,45 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
 
           const SizedBox(height: 12),
 
-          Column(
-            children: [
-              _buildWeekRow([null, null, null, 1, 2, 3, 4]),
-              _buildWeekRow([5, 6, 7, 8, 9, 10, 11]),
-              _buildWeekRow([12, 13, 14, 15, 16, 17, 18]),
-              _buildWeekRow([19, 20, 21, 22, 23, 24, 25]),
-              _buildWeekRow([26, 27, 28, 29, 30, 31, null]),
-            ],
-          ),
+          _buildCalendarGrid(daysInMonth, firstWeekday),
         ],
       ),
     );
   }
 
+  Widget _buildCalendarGrid(int daysInMonth, int firstWeekday) {
+    List<Widget> weeks = [];
+    List<int?> currentWeek = [];
+
+    // Add empty cells for days before the first day of month
+    for (int i = 1; i < firstWeekday; i++) {
+      currentWeek.add(null);
+    }
+
+    // Add all days of the month
+    for (int day = 1; day <= daysInMonth; day++) {
+      currentWeek.add(day);
+
+      if (currentWeek.length == 7) {
+        weeks.add(_buildWeekRow(currentWeek));
+        currentWeek = [];
+      }
+    }
+
+    // Fill last week with empty cells if needed
+    while (currentWeek.length < 7 && currentWeek.isNotEmpty) {
+      currentWeek.add(null);
+    }
+    if (currentWeek.isNotEmpty) {
+      weeks.add(_buildWeekRow(currentWeek));
+    }
+
+    return Column(children: weeks);
+  }
+
   Widget _buildWeekRow(List<int?> days) {
     final colorScheme = Theme.of(context).colorScheme;
+    final today = DateTime.now();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -209,7 +276,9 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
 
           final hasPosts = scheduledPosts.containsKey(day);
           final posts = scheduledPosts[day] ?? [];
-          final isToday = day == 28;
+          final isToday = day == today.day &&
+              currentMonth == today.month &&
+              currentYear == today.year;
           final isSelected = day == selectedDay;
 
           return GestureDetector(
@@ -284,7 +353,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'January $selectedDay, $currentYear',
+              '${_getMonthName(currentMonth)} $selectedDay, $currentYear',
               style: AppTextStyles.heading3.copyWith(
                 color: colorScheme.onSurface,
               ),
@@ -322,12 +391,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                     color: colorScheme.onSurface.withOpacity(0.7),
                   ),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  onPressed: () => _showAddPostDialog(selectedDay!),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Post'),
-                ),
               ],
             ),
           )
@@ -336,19 +399,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
             padding: const EdgeInsets.only(bottom: 8),
             child: _buildPostCard(post, selectedDay!),
           )),
-
-        if (posts.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () => _showAddPostDialog(selectedDay!),
-                icon: const Icon(Icons.add),
-                label: const Text('Add Another Post'),
-              ),
-            ),
-          ),
       ],
     );
   }
@@ -356,6 +406,27 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   Widget _buildAllScheduledPosts() {
     final colorScheme = Theme.of(context).colorScheme;
     final allDays = scheduledPosts.keys.toList()..sort();
+
+    if (allDays.isEmpty) {
+      return CustomCard(
+        child: Column(
+          children: [
+            Icon(
+              Icons.calendar_today,
+              color: colorScheme.onSurface.withOpacity(0.5),
+              size: 48,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No scheduled posts this month',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -376,7 +447,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               Padding(
                 padding: const EdgeInsets.only(top: 16, bottom: 8),
                 child: Text(
-                  'January $day, $currentYear',
+                  '${_getMonthName(currentMonth)} $day, $currentYear',
                   style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
                     color: colorScheme.onSurface.withOpacity(0.7),
@@ -457,17 +528,11 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                   size: 20,
                 ),
                 onSelected: (value) async {
-                  if (value == 'edit') {
-                    await _showEditPostDialog(post, day);
-                  } else if (value == 'delete') {
+                  if (value == 'delete') {
                     await _deletePost(post);
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text('Edit'),
-                  ),
                   const PopupMenuItem(
                     value: 'delete',
                     child: Text('Delete'),
@@ -493,7 +558,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
               ),
             ),
           ],
-          if (post.note != null) ...[
+          if (post.note != null && post.note!.isNotEmpty) ...[
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.all(8),
@@ -515,6 +580,8 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
                       style: AppTextStyles.caption.copyWith(
                         color: colorScheme.onSurface.withOpacity(0.8),
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -526,35 +593,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     );
   }
 
-  Future<void> _showAddPostDialog(int day) async {
-    final result = await showDialog<ScheduledPost>(
-      context: context,
-      builder: (context) => AddPostDialog(
-        selectedDate: DateTime(currentYear, currentMonth, day),
-      ),
-    );
-
-    if (result != null) {
-      await _storageService.addPost(result);
-      await _loadPosts();
-    }
-  }
-
-  Future<void> _showEditPostDialog(ScheduledPost post, int day) async {
-    final result = await showDialog<ScheduledPost>(
-      context: context,
-      builder: (context) => AddPostDialog(
-        selectedDate: DateTime(currentYear, currentMonth, day),
-        existingPost: post,
-      ),
-    );
-
-    if (result != null) {
-      await _storageService.updatePost(result);
-      await _loadPosts();
-    }
-  }
-
   Future<void> _deletePost(ScheduledPost post) async {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -562,7 +600,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Post'),
-        content: const Text('Are you sure you want to delete this post?'),
+        content: const Text('Are you sure you want to delete this scheduled post?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -580,8 +618,17 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     );
 
     if (confirm == true) {
-      await _storageService.deletePost(post.id);
-      await _loadPosts();
+      final success = await _scheduleService.deletePost(post.id);
+      if (success) {
+        await _loadPosts();
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Post deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     }
   }
 }
