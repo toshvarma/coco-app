@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../core/constants/colors.dart';
 import '../../domain/models/chat_message_model.dart';
 import '../../data/services/ai_chat_service.dart';
+import 'post_ready_screen.dart';
 
 class TemplateSelectionScreen extends StatefulWidget {
   final String platform;
@@ -576,14 +577,18 @@ Make each version unique and optimized for its specific format. Be creative and 
   }
 
   void _selectTemplate(GeneratedTemplate template) {
-    // Copy to clipboard
-    final fullText = '''
-${template.caption}
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PostReadyScreen(
+          platform: widget.platform,
+          templateName: template.type.name,
+          caption: template.caption,
+          hashtags: template.hashtags,
+        ),
+      ),
+    );
 
-${template.hashtags}
-''';
-
-    Clipboard.setData(ClipboardData(text: fullText.trim()));
 
     // Show confirmation
     showDialog(
