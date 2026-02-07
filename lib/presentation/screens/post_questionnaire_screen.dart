@@ -56,7 +56,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
         ),
         title: const Text('Create New Post'),
         backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onPrimaryContainer,
+        foregroundColor: colorScheme.onSecondaryContainer,
         elevation: 0,
       ),
       body: SingleChildScrollView(
