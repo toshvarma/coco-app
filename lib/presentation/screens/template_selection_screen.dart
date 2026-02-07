@@ -276,7 +276,7 @@ Make each version unique and optimized for its specific format. Be creative and 
           ),
           const SizedBox(height: 24),
           Text(
-            'AI is creating your templates...',
+            'COCO is creating your templates...',
             style: TextStyle(
               fontSize: 16,
               color: AppColors.primarygreen,
