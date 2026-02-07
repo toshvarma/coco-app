@@ -22,10 +22,12 @@ class TemplateSelectionScreen extends StatefulWidget {
 
 class _TemplateSelectionScreenState extends State<TemplateSelectionScreen> {
   final AiChatService _aiService = AiChatService();
+  final PageController _pageController = PageController();
+
   bool _isLoading = true;
   String? _error;
   List<GeneratedTemplate> _generatedTemplates = [];
-  int? _selectedIndex;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -40,10 +42,8 @@ class _TemplateSelectionScreenState extends State<TemplateSelectionScreen> {
     });
 
     try {
-      // Get template types for this platform
       final templateTypes = _getTemplateTypesForPlatform(widget.platform);
 
-      // Build the AI prompt to generate templates
       final conversationSummary = widget.chatHistory
           .where((msg) => !msg.isUser)
           .map((msg) => msg.content)
@@ -58,7 +58,6 @@ For EACH format, provide:
 1. A compelling caption/post text (appropriate length for the format)
 2. 5-8 relevant hashtags
 3. A call-to-action
-4. Any format-specific elements (e.g., for carousel: slide titles, for video: script outline)
 
 Format your response as follows for each template:
 
@@ -71,21 +70,16 @@ HASHTAGS:
 
 CALL_TO_ACTION:
 [Your CTA here]
-
-FORMAT_SPECIFIC:
-[Any additional format-specific content]
 ---END TEMPLATE---
 
 Make each version unique and optimized for its specific format. Be creative and professional.
 ''';
 
-      // Send to AI
       final response = await _aiService.sendMessage(
         prompt,
         chatHistory: widget.chatHistory.map((msg) => msg.toApiFormat()).toList(),
       );
 
-      // Parse the AI response
       final templates = _parseAIResponse(response, templateTypes);
 
       setState(() {
@@ -167,7 +161,6 @@ Make each version unique and optimized for its specific format. Be creative and 
   List<GeneratedTemplate> _parseAIResponse(String response, List<TemplateType> types) {
     final templates = <GeneratedTemplate>[];
 
-    // Split by template markers
     final sections = response.split('---TEMPLATE:');
 
     for (var i = 1; i < sections.length; i++) {
@@ -176,27 +169,18 @@ Make each version unique and optimized for its specific format. Be creative and 
         final endIndex = section.indexOf('---END TEMPLATE---');
         final content = endIndex != -1 ? section.substring(0, endIndex) : section;
 
-        // Extract template name
         final nameMatch = RegExp(r'^([^\n]+)').firstMatch(content);
         final templateName = nameMatch?.group(1)?.trim() ?? 'Template ${i}';
 
-        // Extract caption
         final captionMatch = RegExp(r'CAPTION:\s*\n(.*?)(?=\n\nHASHTAGS:|$)', dotAll: true).firstMatch(content);
         final caption = captionMatch?.group(1)?.trim() ?? '';
 
-        // Extract hashtags
         final hashtagsMatch = RegExp(r'HASHTAGS:\s*\n(.*?)(?=\n\nCALL_TO_ACTION:|$)', dotAll: true).firstMatch(content);
         final hashtags = hashtagsMatch?.group(1)?.trim() ?? '';
 
-        // Extract CTA
-        final ctaMatch = RegExp(r'CALL_TO_ACTION:\s*\n(.*?)(?=\n\nFORMAT_SPECIFIC:|$)', dotAll: true).firstMatch(content);
+        final ctaMatch = RegExp(r'CALL_TO_ACTION:\s*\n(.*?)$', dotAll: true).firstMatch(content);
         final cta = ctaMatch?.group(1)?.trim() ?? '';
 
-        // Extract format-specific
-        final formatMatch = RegExp(r'FORMAT_SPECIFIC:\s*\n(.*?)$', dotAll: true).firstMatch(content);
-        final formatSpecific = formatMatch?.group(1)?.trim() ?? '';
-
-        // Find matching template type
         final templateType = types.firstWhere(
               (t) => templateName.toLowerCase().contains(t.name.toLowerCase().split(' ').first),
           orElse: () => types[i - 1 < types.length ? i - 1 : 0],
@@ -207,14 +191,12 @@ Make each version unique and optimized for its specific format. Be creative and 
           caption: caption,
           hashtags: hashtags,
           callToAction: cta,
-          formatSpecific: formatSpecific,
         ));
       } catch (e) {
         print('Error parsing template $i: $e');
       }
     }
 
-    // If parsing failed, create fallback templates
     if (templates.isEmpty) {
       for (var type in types) {
         templates.add(GeneratedTemplate(
@@ -222,7 +204,6 @@ Make each version unique and optimized for its specific format. Be creative and 
           caption: response,
           hashtags: '',
           callToAction: '',
-          formatSpecific: '',
         ));
       }
     }
@@ -234,20 +215,49 @@ Make each version unique and optimized for its specific format. Be creative and 
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Choose Your Template'),
-        backgroundColor: AppColors.primarygreen,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
+        appBar: AppBar(
+          backgroundColor: AppColors.primarygreen, // Green background
+          foregroundColor: Colors.white, // White text
+          elevation: 0,
+          title: const Text(
+            'Choose Your Template',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          iconTheme: const IconThemeData(
+            color: Colors.white, // White back arrow
+          ),
+          actions: [
+            if (!_isLoading && _generatedTemplates.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      '2/2',
+                      style: TextStyle(
+                        color: AppColors.primarygreen,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       body: _isLoading
           ? _buildLoadingState()
           : _error != null
           ? _buildErrorState()
-          : _buildTemplateList(),
-      bottomNavigationBar: _selectedIndex != null && !_isLoading
-          ? _buildContinueButton()
-          : null,
+          : _buildSwipeableTemplates(),
     );
   }
 
@@ -317,355 +327,363 @@ Make each version unique and optimized for its specific format. Be creative and 
     );
   }
 
-  Widget _buildTemplateList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _generatedTemplates.length,
-      itemBuilder: (context, index) {
-        final template = _generatedTemplates[index];
-        final isSelected = _selectedIndex == index;
-
-        return GestureDetector(
-          onTap: () {
+  Widget _buildSwipeableTemplates() {
+    return Stack(
+      children: [
+        PageView.builder(
+          controller: _pageController,
+          itemCount: _generatedTemplates.length,
+          onPageChanged: (index) {
             setState(() {
-              _selectedIndex = index;
+              _currentPage = index;
             });
           },
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
+          itemBuilder: (context, index) {
+            return _buildTemplatePage(_generatedTemplates[index]);
+          },
+        ),
+
+        // Swipe indicators
+        if (_generatedTemplates.length > 1)
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                _generatedTemplates.length,
+                    (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentPage == index ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentPage == index
+                        ? AppColors.primarygreen
+                        : Colors.grey[300],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildTemplatePage(GeneratedTemplate template) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Template name header
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppColors.primarygreen, AppColors.primarygreen],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(template.type.icon, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  template.type.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // Page counter - bigger and below badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.primarygreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: AppColors.primarygreen.withOpacity(0.3),
+                width: 1.5,
+              ),
+            ),
+            child: Text(
+              '${_currentPage + 1} of ${_generatedTemplates.length}',
+              style: TextStyle(
+                color: AppColors.primarygreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Phone mockup with portrait image placeholder
+          Container(
+            width: 280,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isSelected ? AppColors.primarygreen : AppColors.border,
-                width: isSelected ? 3 : 1,
-              ),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: isSelected
-                      ? AppColors.primarygreen.withOpacity(0.3)
-                      : Colors.black.withOpacity(0.05),
-                  blurRadius: isSelected ? 12 : 5,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
             ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+                // Portrait image placeholder
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  width: 280,
+                  height: 400,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isSelected
-                          ? [AppColors.primarygreen, AppColors.primarygreen]
-                          : [AppColors.lightGreen.withOpacity(0.3), AppColors.background],
-                    ),
+                    color: Colors.grey[200],
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
                     ),
                   ),
-                  child: Row(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        template.type.icon,
-                        color: isSelected ? Colors.white : AppColors.primarygreen,
-                        size: 28,
+                        Icons.image_outlined,
+                        size: 80,
+                        color: Colors.grey[400],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          template.type.name,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isSelected ? Colors.white : AppColors.primarygreen,
-                          ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Post Preview',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      if (isSelected)
-                        const Icon(Icons.check_circle, color: Colors.white, size: 24),
                     ],
                   ),
                 ),
 
-                // Content preview
-                Padding(
+                // Caption and hashtags
+                Container(
+                  width: 280,
                   padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Caption
                       if (template.caption.isNotEmpty) ...[
-                        Row(
-                          children: [
-                            Icon(Icons.text_fields, size: 16, color: AppColors.primarygreen),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Caption',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primarygreen,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
                         Text(
                           template.caption,
                           style: const TextStyle(
                             fontSize: 14,
-                            height: 1.5,
+                            color: Colors.black87,
+                            height: 1.4,
                           ),
                           maxLines: 4,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                       ],
 
                       // Hashtags
-                      if (template.hashtags.isNotEmpty) ...[
-                        Row(
-                          children: [
-                            Icon(Icons.tag, size: 16, color: AppColors.primarygreen),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Hashtags',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primarygreen,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
+                      if (template.hashtags.isNotEmpty)
                         Text(
                           template.hashtags,
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.blue[700],
+                            height: 1.3,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 16),
-                      ],
-
-                      // CTA
-                      if (template.callToAction.isNotEmpty) ...[
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.primarygreen.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.primarygreen.withOpacity(0.3)),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.touch_app, size: 16, color: AppColors.primarygreen),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  template.callToAction,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primarygreen,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-
-                      // Format-specific
-                      if (template.formatSpecific.isNotEmpty) ...[
-                        const SizedBox(height: 16),
-                        ExpansionTile(
-                          title: Text(
-                            'Additional Details',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primarygreen,
-                            ),
-                          ),
-                          tilePadding: EdgeInsets.zero,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Text(
-                                template.formatSpecific,
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-
-                      // Copy button
-                      const SizedBox(height: 12),
-                      TextButton.icon(
-                        onPressed: () => _copyTemplate(template),
-                        icon: const Icon(Icons.copy, size: 16),
-                        label: const Text('Copy All'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.primarygreen,
-                        ),
-                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-        );
-      },
-    );
-  }
 
-  Widget _buildContinueButton() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+          const Spacer(),
+
+          // Select Template button at bottom
+          Padding(
+            padding: const EdgeInsets.only(bottom: 40),
+            child: SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: ElevatedButton(
+                onPressed: () => _selectTemplate(template),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primarygreen,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  'Select Template',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
-      child: SafeArea(
-        child: ElevatedButton(
-          onPressed: _handleUseTemplate,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primarygreen,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 54),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+    );
+  }
+
+  Widget _buildContentSection(String title, IconData icon, String content, {Color? textColor}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: AppColors.primarygreen),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primarygreen,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 15,
+              color: textColor ?? Colors.black87,
+              height: 1.5,
             ),
           ),
-          child: const Text(
-            'Use This Template',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
+        ],
       ),
     );
   }
 
-  void _copyTemplate(GeneratedTemplate template) {
+  void _selectTemplate(GeneratedTemplate template) {
+    // Copy to clipboard
     final fullText = '''
 ${template.caption}
 
 ${template.hashtags}
-
-${template.callToAction}
-
-${template.formatSpecific}
 ''';
 
     Clipboard.setData(ClipboardData(text: fullText.trim()));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Template copied to clipboard!'),
-        backgroundColor: AppColors.primarygreen,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
 
-  void _handleUseTemplate() {
-    final selected = _generatedTemplates[_selectedIndex!];
-
-    _copyTemplate(selected);
-
+    // Show confirmation
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(Icons.check_circle, color: AppColors.primarygreen),
+            Icon(Icons.check_circle, color: AppColors.primarygreen, size: 28),
             const SizedBox(width: 12),
-            const Expanded(child: Text('Template Copied!')),
+            const Expanded(child: Text('Template Selected!')),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Your ${selected.type.name} is ready to use!',
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.border),
+                color: AppColors.primarygreen.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
-                children: const [
-                  Icon(Icons.check, size: 16, color: Colors.green),
-                  SizedBox(width: 8),
+                children: [
+                  Icon(Icons.copy_all, color: AppColors.primarygreen, size: 20),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Copied to clipboard',
-                      style: TextStyle(fontSize: 13),
+                      'Content copied to clipboard',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.primarygreen,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
-              'What would you like to do next?',
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[700],
-              ),
+              'Your ${template.type.name.toLowerCase()} is ready to post on ${widget.platform}!',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),
         actions: [
-          // Go back to chat
-          TextButton.icon(
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'View Another',
+              style: TextStyle(color: AppColors.primarygreen),
+            ),
+          ),
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context); // Close dialog
               Navigator.pop(context); // Go back to chat
             },
-            icon: const Icon(Icons.chat, size: 18),
-            label: const Text('Edit with AI'),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.primarygreen,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primarygreen,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-          ),
-          // Stay here
-          TextButton.icon(
-            onPressed: () {
-              Navigator.pop(context); // Only close dialog
-            },
-            icon: const Icon(Icons.done, size: 18),
-            label: const Text('Select Another'),
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.primarygreen,
-              backgroundColor: AppColors.primarygreen.withOpacity(0.1),
-            ),
+            child: const Text('Done'),
           ),
         ],
-        actionsAlignment: MainAxisAlignment.spaceBetween,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }
 
@@ -687,13 +705,11 @@ class GeneratedTemplate {
   final String caption;
   final String hashtags;
   final String callToAction;
-  final String formatSpecific;
 
   GeneratedTemplate({
     required this.type,
     required this.caption,
     required this.hashtags,
     required this.callToAction,
-    required this.formatSpecific,
   });
 }
