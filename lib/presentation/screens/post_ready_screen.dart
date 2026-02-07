@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/colors.dart';
 
 class PostReadyScreen extends StatelessWidget {
   final String platform;
@@ -17,8 +16,10 @@ class PostReadyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: AppColors.primarygreen,
+      backgroundColor: colorScheme.primary,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -30,25 +31,25 @@ class PostReadyScreen extends StatelessWidget {
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: AppColors.primarygreen,
+                    color: colorScheme.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.check,
                     size: 60,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                   ),
                 ),
 
                 const SizedBox(height: 32),
 
-                const Text(
+                Text(
                   'Your post is ready\nand waiting',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: colorScheme.onPrimary,
                     height: 1.3,
                   ),
                 ),
@@ -63,13 +64,13 @@ class PostReadyScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: const Text('Post confirmed!'),
-                          backgroundColor: AppColors.primarygreen,
+                          backgroundColor: colorScheme.primary,
                         ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lightGreen,
-                      foregroundColor: AppColors.primarygreen,
+                      backgroundColor: colorScheme.secondaryContainer,
+                      foregroundColor: colorScheme.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(25),
                       ),
@@ -102,10 +103,10 @@ class PostReadyScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'or schedule for later',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       decoration: TextDecoration.underline,
                     ),
                   ),
@@ -113,19 +114,19 @@ class PostReadyScreen extends StatelessWidget {
 
                 const SizedBox(height: 60),
 
-                const Text(
+                Text(
                   'Want to change something?',
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(color: colorScheme.onPrimary.withOpacity(0.7)),
                 ),
 
                 const SizedBox(height: 8),
 
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
+                  child: Text(
                     'Go Back',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       fontWeight: FontWeight.w600,
                       decoration: TextDecoration.underline,
                     ),
