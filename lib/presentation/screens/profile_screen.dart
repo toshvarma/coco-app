@@ -256,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'Pro Plan',
+                    'Economy Plan',
                     style: AppTextStyles.caption.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.w600,
@@ -607,14 +607,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pro Plan',
+                          'Economy Plan',
                           style: AppTextStyles.heading3.copyWith(
                             color: colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '\$29.99/month',
+                          '\€59.99/month',
                           style: AppTextStyles.bodySmall.copyWith(
                             fontWeight: FontWeight.w600,
                             color: colorScheme.onSurface,
