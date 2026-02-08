@@ -15,73 +15,95 @@ class AnalyticsScreen extends StatefulWidget {
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
   String selectedPlatform = 'Instagram';
 
-  // NEW: Add these variables
   final ReviewService _reviewService = ReviewService();
   final AuthService _authService = AuthService();
-  String _personaId = 'lena'; // default
 
-  // NEW: Add this method
+  String _personaId = 'lena';
+  Map<String, dynamic> _userStats = {};
+
   @override
   void initState() {
     super.initState();
     _loadUserPersona();
   }
 
-  // NEW: This method detects which user is logged in
   Future<void> _loadUserPersona() async {
     final user = await _authService.getCurrentUser();
     if (user != null && mounted) {
       setState(() {
-        // Check the email and set the persona ID
         if (user['email'] == 'mike@coco.com') {
           _personaId = 'mike';
-        } else if (user['email'] == 'lena@coco.com') {
+          _userStats = _getMikeStats();
+        } else {
           _personaId = 'lena';
+          _userStats = _getLenaStats();
         }
       });
     }
   }
 
+  Map<String, dynamic> _getLenaStats() {
+    return {
+      'growthRate': '3.80%',
+      'growthIncrease': '17%',
+      'latestPostViews': '2.5k',
+      'posts': '12',
+      'reach': '3.5k',
+      'engagement': '24%',
+      'chartPoints': [
+        {'date': '20 Nov', 'value': 0.85, 'followers': '25k'},
+        {'date': '26 Nov', 'value': 0.75, 'followers': '26k'},
+        {'date': '01 Dec', 'value': 0.65, 'followers': '27k'},
+        {'date': '06 Dec', 'value': 0.55, 'followers': '28k'},
+        {'date': '11 Dec', 'value': 0.35, 'followers': '31k'},
+        {'date': '16 Dec', 'value': 0.20, 'followers': '33k'},
+      ],
+      'yAxisLabels': ['35k', '33k', '31k', '29k', '27k', '25k', '23k'],
+    };
+  }
+
+  Map<String, dynamic> _getMikeStats() {
+    return {
+      'growthRate': '5.20%',
+      'growthIncrease': '23%',
+      'latestPostViews': '4.8k',
+      'posts': '18',
+      'reach': '7.2k',
+      'engagement': '31%',
+      'chartPoints': [
+        {'date': '20 Nov', 'value': 0.85, 'followers': '38k'},
+        {'date': '26 Nov', 'value': 0.70, 'followers': '40k'},
+        {'date': '01 Dec', 'value': 0.55, 'followers': '42k'},
+        {'date': '06 Dec', 'value': 0.45, 'followers': '44k'},
+        {'date': '11 Dec', 'value': 0.25, 'followers': '47k'},
+        {'date': '16 Dec', 'value': 0.10, 'followers': '50k'},
+      ],
+      'yAxisLabels': ['52k', '50k', '47k', '44k', '42k', '40k', '38k'],
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
-            Text(
-              'Your Statistics',
-              style: AppTextStyles.heading1,
-            ),
+            Text('Your Statistics', style: AppTextStyles.heading1),
             const SizedBox(height: 24),
-
-            // Platform Selector Dropdown
             _buildPlatformSelector(),
             const SizedBox(height: 24),
-
-            // Stats Cards Row
             Row(
               children: [
-                Expanded(
-                  child: _buildGrowthRateCard(),
-                ),
+                Expanded(child: _buildGrowthRateCard()),
                 const SizedBox(width: 12),
-                Expanded(
-                  child: _buildLatestPostCard(),
-                ),
+                Expanded(child: _buildLatestPostCard()),
               ],
             ),
             const SizedBox(height: 24),
-
-            // Followers Chart Card
             _buildFollowersChart(),
             const SizedBox(height: 24),
-
-            // UPDATED: Convert to Value Card with working navigation
             _buildConvertCard(),
           ],
         ),
@@ -103,19 +125,17 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         value: selectedPlatform,
         isExpanded: true,
         underline: const SizedBox(),
-        icon: const Icon(Icons.keyboard_arrow_down),
-        style: AppTextStyles.body.copyWith(color: colorScheme.onSurface),
-        items: ['Instagram', 'Facebook', 'LinkedIn',]
-            .map((platform) => DropdownMenuItem(
-          value: platform,
-          child: Text(platform),
-        ))
+        items: ['Instagram', 'Facebook', 'LinkedIn']
+            .map(
+              (platform) => DropdownMenuItem(
+            value: platform,
+            child: Text(platform),
+          ),
+        )
             .toList(),
         onChanged: (value) {
           if (value != null) {
-            setState(() {
-              selectedPlatform = value;
-            });
+            setState(() => selectedPlatform = value);
           }
         },
       ),
@@ -129,14 +149,10 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          Icon(
-            Icons.trending_up,
-            color: colorScheme.primary,
-            size: 32,
-          ),
+          Icon(Icons.trending_up, color: colorScheme.primary, size: 32),
           const SizedBox(height: 12),
           Text(
-            '3.80%',
+            _userStats['growthRate'] ?? '0%',
             style: AppTextStyles.heading1.copyWith(
               fontSize: 28,
               color: colorScheme.primary,
@@ -144,19 +160,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Followers Growth Rate',
-            style: AppTextStyles.caption.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.7),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "That's a 17% increase from last week!",
-            style: AppTextStyles.caption.copyWith(
-              fontSize: 11,
-              color: colorScheme.onSurface.withOpacity(0.6),
-            ),
+            "That's a ${_userStats['growthIncrease'] ?? '0%'} increase from last week!",
+            style: AppTextStyles.caption,
             textAlign: TextAlign.center,
           ),
         ],
@@ -170,76 +175,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Latest Post',
-                style: AppTextStyles.bodySmall.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check,
-                  color: colorScheme.primary,
-                  size: 16,
-                ),
-              ),
-            ],
-          ),
+          Text('Latest Post', style: AppTextStyles.bodySmall),
           const SizedBox(height: 16),
-          // Centered circular progress
-          Center(
-            child: SizedBox(
-              width: 90,
-              height: 90,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 90,
-                    height: 90,
-                    child: CircularProgressIndicator(
-                      value: 0.65,
-                      strokeWidth: 8,
-                      backgroundColor: colorScheme.outline.withOpacity(0.2),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Views',
-                        style: AppTextStyles.caption.copyWith(
-                          fontSize: 11,
-                          color: colorScheme.onSurface.withOpacity(0.7),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '2.5k',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          Text(
+            _userStats['latestPostViews'] ?? '0',
+            style: AppTextStyles.heading3.copyWith(
+              color: colorScheme.primary,
             ),
           ),
         ],
@@ -250,25 +192,23 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget _buildFollowersChart() {
     final colorScheme = Theme.of(context).colorScheme;
 
+    final List<String> yAxisLabels =
+    List<String>.from(_userStats['yAxisLabels'] ?? []);
+
+    final List<Map<String, dynamic>> chartPoints =
+    List<Map<String, dynamic>>.from(_userStats['chartPoints'] ?? []);
+
     return CustomCard(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Followers',
-            style: AppTextStyles.heading3.copyWith(
-              color: colorScheme.onSurface,
-            ),
-          ),
+          Text('Followers', style: AppTextStyles.heading3),
           const SizedBox(height: 24),
-
-          // Chart area
           SizedBox(
             height: 200,
             child: Stack(
               children: [
-                // Y-axis labels
                 Positioned(
                   left: 0,
                   top: 0,
@@ -276,19 +216,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _buildYAxisLabel('35k'),
-                      _buildYAxisLabel('33k'),
-                      _buildYAxisLabel('31k'),
-                      _buildYAxisLabel('29k'),
-                      _buildYAxisLabel('27k'),
-                      _buildYAxisLabel('25k'),
-                      _buildYAxisLabel('23k'),
-                    ],
+                    children: yAxisLabels
+                        .map((label) => _buildYAxisLabel(label))
+                        .toList(),
                   ),
                 ),
-
-                // Chart area with line
                 Positioned(
                   left: 40,
                   right: 0,
@@ -298,29 +230,26 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     painter: LineChartPainter(
                       primaryColor: colorScheme.primary,
                       surfaceColor: colorScheme.surface,
-                      borderColor: colorScheme.outline.withOpacity(0.3),
+                      borderColor:
+                      colorScheme.outline.withOpacity(0.3),
+                      chartPoints: chartPoints,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 8),
-
-          // X-axis labels
           Padding(
             padding: const EdgeInsets.only(left: 40),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildXAxisLabel('20 Nov'),
-                _buildXAxisLabel('26 Nov'),
-                _buildXAxisLabel('01 Dec'),
-                _buildXAxisLabel('06 Dec'),
-                _buildXAxisLabel('11 Dec'),
-                _buildXAxisLabel('16 Dec'),
-              ],
+              children: chartPoints
+                  .map<Widget>(
+                    (point) =>
+                    _buildXAxisLabel(point['date'] as String),
+              )
+                  .toList(),
             ),
           ),
         ],
@@ -328,88 +257,36 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
-  Widget _buildYAxisLabel(String text) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildYAxisLabel(String text) =>
+      Text(text, style: AppTextStyles.caption);
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Text(
-        text,
-        style: AppTextStyles.caption.copyWith(
-          fontSize: 10,
-          color: colorScheme.onSurface.withOpacity(0.6),
-        ),
-      ),
-    );
-  }
+  Widget _buildXAxisLabel(String text) =>
+      Text(text, style: AppTextStyles.caption);
 
-  Widget _buildXAxisLabel(String text) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Text(
-      text,
-      style: AppTextStyles.caption.copyWith(
-        fontSize: 10,
-        color: colorScheme.onSurface.withOpacity(0.6),
-      ),
-    );
-  }
-
-  // UPDATED: This card now has a working button
   Widget _buildConvertCard() {
     final colorScheme = Theme.of(context).colorScheme;
 
     return InkWell(
       onTap: () {
-        // Get the review data for the current user
-        final reviewData = _reviewService.getReviewForUser(_personaId);
-
-        // Navigate to review screen with the data
+        final reviewData =
+        _reviewService.getReviewForUser(_personaId);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ReviewScreen(reviewData: reviewData),
+            builder: (_) => ReviewScreen(reviewData: reviewData),
           ),
         );
       },
-      borderRadius: BorderRadius.circular(12),
       child: CustomCard(
         child: Row(
           children: [
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Let's convert this to more value",
-                    style: AppTextStyles.bodySmall.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'View our feedback and recommendations based on your statistics.',
-                    style: AppTextStyles.caption.copyWith(
-                      color: colorScheme.onSurface.withOpacity(0.7),
-                    ),
-                  ),
-                ],
+              child: Text(
+                "Let's convert this to more value",
+                style: AppTextStyles.bodySmall,
               ),
             ),
-            const SizedBox(width: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.arrow_forward,
-                color: colorScheme.primary,
-                size: 20,
-              ),
-            ),
+            Icon(Icons.arrow_forward, color: colorScheme.primary),
           ],
         ),
       ),
@@ -417,94 +294,48 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 }
 
-// Custom painter for the line chart
+// ================= LINE CHART PAINTER =================
+
 class LineChartPainter extends CustomPainter {
   final Color primaryColor;
   final Color surfaceColor;
   final Color borderColor;
+  final List<Map<String, dynamic>> chartPoints;
 
   LineChartPainter({
     required this.primaryColor,
     required this.surfaceColor,
     required this.borderColor,
+    required this.chartPoints,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (chartPoints.isEmpty) return;
+
     final paint = Paint()
       ..color = primaryColor
       ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+      ..style = PaintingStyle.stroke;
 
     final path = Path();
 
-    // Define chart points (simulating follower growth from 25k to 33k)
-    final points = [
-      Offset(0, size.height * 0.85),              // 25k - Nov 20
-      Offset(size.width * 0.2, size.height * 0.75), // 26k - Nov 26
-      Offset(size.width * 0.4, size.height * 0.65), // 27k - Dec 01
-      Offset(size.width * 0.6, size.height * 0.55), // 28k - Dec 06
-      Offset(size.width * 0.8, size.height * 0.35), // 31k - Dec 11
-      Offset(size.width, size.height * 0.2),       // 33k - Dec 16
-    ];
+    final points = chartPoints.asMap().entries.map((entry) {
+      final x =
+          (size.width / (chartPoints.length - 1)) * entry.key;
+      final y = size.height * (entry.value['value'] as double);
+      return Offset(x, y);
+    }).toList();
 
-    path.moveTo(points[0].dx, points[0].dy);
+    path.moveTo(points.first.dx, points.first.dy);
 
     for (int i = 1; i < points.length; i++) {
-      final previous = points[i - 1];
-      final current = points[i];
-
-      final controlPoint1 = Offset(
-        previous.dx + (current.dx - previous.dx) / 3,
-        previous.dy,
-      );
-      final controlPoint2 = Offset(
-        previous.dx + 2 * (current.dx - previous.dx) / 3,
-        current.dy,
-      );
-
-      path.cubicTo(
-        controlPoint1.dx,
-        controlPoint1.dy,
-        controlPoint2.dx,
-        controlPoint2.dy,
-        current.dx,
-        current.dy,
-      );
+      path.lineTo(points[i].dx, points[i].dy);
     }
 
     canvas.drawPath(path, paint);
-
-    // Draw dots at data points
-    final dotPaint = Paint()
-      ..color = primaryColor
-      ..style = PaintingStyle.fill;
-
-    final dotBorderPaint = Paint()
-      ..color = surfaceColor
-      ..style = PaintingStyle.fill;
-
-    for (final point in points) {
-      canvas.drawCircle(point, 5, dotBorderPaint);
-      canvas.drawCircle(point, 4, dotPaint);
-    }
-
-    // Draw horizontal grid lines
-    final gridPaint = Paint()
-      ..color = borderColor
-      ..strokeWidth = 1;
-
-    for (int i = 0; i <= 6; i++) {
-      final y = size.height * i / 6;
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y),
-        gridPaint,
-      );
-    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(_) => false;
 }
