@@ -337,7 +337,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
             Icon(Icons.auto_awesome, size: 20),
             SizedBox(width: 8),
             Text(
-              'Start Creating with AI',
+              'Start Creating with COCO',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
