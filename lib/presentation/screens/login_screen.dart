@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primarygreen,
+      backgroundColor: Colors.white,  // Changed to white
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -75,34 +75,31 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.eco,
-                  size: 80,
-                  color: Colors.white,
+                Image.asset(
+                  'assets/images/coco-logo.png',
+                  width: 240,
+                  height: 240,
+                  fit: BoxFit.contain,
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'COCO',
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                const SizedBox(height: 20),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Social Media Assistant',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.white70,
+                    color: Colors.grey[700],  // Changed to grey for visibility on white
                   ),
                 ),
                 const SizedBox(height: 48),
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.grey[100],  // Light grey background for contrast
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.grey[300]!,
+                      width: 1,
+                    ),
                   ),
                   child: Column(
                     children: [
@@ -118,6 +115,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(color: AppColors.primarygreen, width: 2),
                           ),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -134,6 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide(color: AppColors.primarygreen, width: 2),
                           ),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
                         onSubmitted: (_) => _handleLogin(),
                       ),
@@ -165,10 +166,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
+                Text(
                   'Demo Accounts',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Colors.grey[800],  // Changed to dark grey for visibility
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -180,9 +181,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: OutlinedButton(
                         onPressed: () => _fillDemoAccount('lena@coco.com', 'password1'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.white, width: 2),
+                          foregroundColor: Colors.white,  // White text
+                          backgroundColor: AppColors.primarygreen,  // Green background
+                          side: BorderSide(color: AppColors.primarygreen, width: 2),
                           padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: const Column(
                           children: [
@@ -197,9 +202,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: OutlinedButton(
                         onPressed: () => _fillDemoAccount('mike@coco.com', 'password2'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: const BorderSide(color: Colors.white, width: 2),
+                          foregroundColor: Colors.white,  // White text
+                          backgroundColor: AppColors.primarygreen,  // Green background
+                          side: BorderSide(color: AppColors.primarygreen, width: 2),
                           padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                         child: const Column(
                           children: [
