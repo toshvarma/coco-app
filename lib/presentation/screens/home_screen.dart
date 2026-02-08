@@ -7,6 +7,7 @@ import 'package:coco_app/presentation/screens/calendar_screen.dart';
 import 'package:coco_app/presentation/screens/profile_screen.dart';
 import 'package:coco_app/presentation/screens/chat_screen.dart';
 import 'package:coco_app/data/services/auth_service.dart';
+import 'package:coco_app/presentation/screens/review_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -237,7 +238,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
-          _arrow(context, () => widget.onNavigate(1)),
+          _arrow(context, () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ReviewScreen(personaId: 'lena'),
+              ),
+            );
+          }),
         ],
       ),
     );

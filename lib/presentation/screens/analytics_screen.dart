@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
+import 'package:coco_app/presentation/screens/review_screen.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
