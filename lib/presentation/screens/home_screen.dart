@@ -6,6 +6,7 @@ import 'package:coco_app/presentation/screens/new_post_screen.dart';
 import 'package:coco_app/presentation/screens/calendar_screen.dart';
 import 'package:coco_app/presentation/screens/profile_screen.dart';
 import 'package:coco_app/presentation/screens/chat_screen.dart';
+import 'package:coco_app/data/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,13 +73,36 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ------------------------------------------------------
-// DASHBOARD SCREEN — FULL RESTORE
+// DASHBOARD SCREEN — WITH DYNAMIC USER NAME
 // ------------------------------------------------------
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   final Function(int) onNavigate;
 
   const DashboardScreen({super.key, required this.onNavigate});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  final _authService = AuthService();
+  String _userName = 'Loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null && mounted) {
+      setState(() {
+        _userName = user['name'] ?? 'User';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +144,7 @@ class DashboardScreen extends StatelessWidget {
                 Text('Dashboard',
                     style: AppTextStyles.heading2
                         .copyWith(color: cs.onPrimary)),
-                Text('Lena Hoffman',
+                Text(_userName,
                     style: AppTextStyles.bodySmall
                         .copyWith(color: cs.onPrimary.withOpacity(0.9))),
               ],
@@ -168,7 +192,7 @@ class DashboardScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              _arrow(context, () => onNavigate(1)),
+              _arrow(context, () => widget.onNavigate(1)),
             ],
           ),
           const SizedBox(height: 16),
@@ -213,7 +237,7 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-          _arrow(context, () => onNavigate(1)),
+          _arrow(context, () => widget.onNavigate(1)),
         ],
       ),
     );
@@ -232,7 +256,7 @@ class DashboardScreen extends StatelessWidget {
                 child: Text('Your Calendar',
                     style: AppTextStyles.heading3),
               ),
-              _arrow(context, () => onNavigate(3)),
+              _arrow(context, () => widget.onNavigate(3)),
             ],
           ),
           const SizedBox(height: 4),
