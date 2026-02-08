@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/colors.dart';
 import '../../data/services/schedule_service.dart';
 import '../../domain/models/scheduled_post_model.dart';
+import 'home_screen.dart';
 
 class PostReadyScreen extends StatelessWidget {
   final String platform;
@@ -107,7 +108,32 @@ class PostReadyScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 60),
+                const SizedBox(height: 40),
+
+                // Dashboard button
+                SizedBox(
+                  width: 200,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _returnToDashboard(context),
+                    label: const Text(
+                      'Back to Dashboard',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primarygreen,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 40),
 
                 const Text(
                   'Want to change something?',
@@ -132,6 +158,13 @@ class PostReadyScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _returnToDashboard(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+          (route) => false,
     );
   }
 
