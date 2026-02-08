@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   static const String _baseUrl = 'http://10.0.2.2:3000/api/auth';
   //static const String _baseUrl = 'http://localhost:3000/api/auth';
-
+//static const String _baseUrl = 'http://10.19.79.35:3000/api/chat';
+  
   Future<Map<String, dynamic>?> login(String email, String password) async {
     try {
       final response = await http.post(
