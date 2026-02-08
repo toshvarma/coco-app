@@ -116,7 +116,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         _buildLegendItem('Instagram', _getPlatformColor('Instagram')),
         _buildLegendItem('Facebook', _getPlatformColor('Facebook')),
         _buildLegendItem('LinkedIn', _getPlatformColor('LinkedIn')),
-        _buildLegendItem('TikTok', _getPlatformColor('TikTok')),
       ],
     );
   }
@@ -146,8 +145,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         return const Color(0xFF1877F2);
       case 'linkedin':
         return const Color(0xFF0A66C2);
-      case 'tiktok':
-        return Colors.black;
       default:
         return Theme.of(context).colorScheme.primary;
     }

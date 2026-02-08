@@ -35,7 +35,6 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     'Instagram',
     'Facebook',
     'LinkedIn',
-    'TikTok',
   ];
 
   @override
@@ -265,8 +264,6 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
         return Icons.facebook;
       case 'LinkedIn':
         return Icons.business;
-      case 'TikTok':
-        return Icons.music_note;
       default:
         return Icons.public;
     }

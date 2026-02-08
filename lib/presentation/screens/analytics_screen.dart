@@ -75,7 +75,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         underline: const SizedBox(),
         icon: const Icon(Icons.keyboard_arrow_down),
         style: AppTextStyles.body.copyWith(color: colorScheme.onSurface),
-        items: ['Instagram', 'Facebook', 'LinkedIn', 'TikTok']
+        items: ['Instagram', 'Facebook', 'LinkedIn',]
             .map((platform) => DropdownMenuItem(
           value: platform,
           child: Text(platform),

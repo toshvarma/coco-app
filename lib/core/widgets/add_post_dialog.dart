@@ -30,7 +30,6 @@ class _AddPostDialogState extends State<AddPostDialog> {
     'Instagram',
     'Facebook',
     'LinkedIn',
-    'TikTok',
   ];
 
   @override

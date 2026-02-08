@@ -114,12 +114,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   username: _userName,
                   color: const Color(0xFF0A66C2),
                 ),
-                _buildPlatformItem(
-                  context,
-                  platform: 'TikTok',
-                  isConnected: false,
-                  color: Colors.black,
-                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -742,8 +736,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return Icons.facebook;
       case 'linkedin':
         return Icons.work_outline;
-      case 'tiktok':
-        return Icons.music_note;
       default:
         return Icons.link;
     }

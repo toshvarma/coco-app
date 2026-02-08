@@ -139,19 +139,6 @@ Make each version unique and optimized for its specific format. Be creative and 
             icon: Icons.videocam,
           ),
         ];
-      case 'TikTok':
-        return [
-          TemplateType(
-            name: 'Trending Video',
-            description: 'Short-form video script',
-            icon: Icons.music_note,
-          ),
-          TemplateType(
-            name: 'Tutorial Style',
-            description: 'Step-by-step guide',
-            icon: Icons.school,
-          ),
-        ];
       default:
         return [];
     }
