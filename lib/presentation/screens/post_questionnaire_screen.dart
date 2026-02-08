@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../../data/services/ai_chat_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'post_creation_chat_screen.dart';
@@ -13,10 +15,12 @@ class PostQuestionnaireScreen extends StatefulWidget {
 
 class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
   final _formKey = GlobalKey<FormState>();
+  final ImagePicker _picker = ImagePicker();
 
   String _selectedOccasion = 'Product Launch';
   String _selectedPlatform = 'Instagram';
   final TextEditingController _descriptionController = TextEditingController();
+  List<XFile> _selectedImages = [];
 
   bool _isLoading = false;
 
@@ -81,6 +85,12 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
               _buildSectionTitle('3. Brief description'),
               const SizedBox(height: 12),
               _buildDescriptionField(),
+              const SizedBox(height: 24),
+
+              // NEW: Image upload section
+              _buildSectionTitle('4. Add images (optional)'),
+              const SizedBox(height: 12),
+              _buildImageUploadSection(),
               const SizedBox(height: 32),
 
               _buildSubmitButton(),
@@ -306,6 +316,176 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     );
   }
 
+  // NEW: Image upload section
+  Widget _buildImageUploadSection() {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Upload buttons
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickImages(ImageSource.gallery),
+                icon: Icon(Icons.photo_library, color: colorScheme.primary),
+                label: Text(
+                  'From Gallery',
+                  style: TextStyle(color: colorScheme.primary),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: colorScheme.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickImages(ImageSource.camera),
+                icon: Icon(Icons.camera_alt, color: colorScheme.primary),
+                label: Text(
+                  'Take Photo',
+                  style: TextStyle(color: colorScheme.primary),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: colorScheme.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Display selected images
+        if (_selectedImages.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: colorScheme.outline.withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${_selectedImages.length} image${_selectedImages.length > 1 ? 's' : ''} selected',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => setState(() => _selectedImages.clear()),
+                      icon: const Icon(Icons.clear, size: 16),
+                      label: const Text('Clear All'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _selectedImages.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                File(_selectedImages[index].path),
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedImages.removeAt(index);
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  // NEW: Pick images method
+  Future<void> _pickImages(ImageSource source) async {
+    try {
+      if (source == ImageSource.gallery) {
+        final List<XFile> images = await _picker.pickMultiImage();
+        if (images.isNotEmpty) {
+          setState(() {
+            _selectedImages.addAll(images);
+          });
+        }
+      } else {
+        final XFile? image = await _picker.pickImage(source: source);
+        if (image != null) {
+          setState(() {
+            _selectedImages.add(image);
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error picking images: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Widget _buildSubmitButton() {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -331,14 +511,16 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
             valueColor: AlwaysStoppedAnimation<Color>(colorScheme.onPrimary),
           ),
         )
-            : const Row(
+            : Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.auto_awesome, size: 20),
-            SizedBox(width: 8),
+            const Icon(Icons.auto_awesome, size: 20),
+            const SizedBox(width: 8),
             Text(
-              'Start Creating with COCO',
-              style: TextStyle(
+              _selectedImages.isNotEmpty
+                  ? 'Start Creating with Images'
+                  : 'Start Creating with COCO',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -357,10 +539,17 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final contextPrompt = '''
+      String contextPrompt = '''
 I'm working on a ${_selectedOccasion.toLowerCase()} post for ${_selectedPlatform}.
 
 Project details: ${_descriptionController.text.trim()}
+''';
+
+      if (_selectedImages.isNotEmpty) {
+        contextPrompt += '\n\nI have ${_selectedImages.length} image${_selectedImages.length > 1 ? 's' : ''} to include in this post.';
+      }
+
+      contextPrompt += '''
 
 Please help me create engaging content that:
 - Fits the ${_selectedPlatform} platform style and best practices
