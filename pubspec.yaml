@@ -38,3 +38,5 @@ flutter:
 
   assets:
     - assets/images/coco-logo.png
+    - assets/templates/instagram/
+    - assets/templates/linkedin/

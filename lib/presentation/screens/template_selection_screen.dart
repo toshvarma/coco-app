@@ -101,16 +101,19 @@ Make each version unique and optimized for its specific format. Be creative and 
             name: 'Carousel Post',
             description: 'Multiple images with engaging captions',
             icon: Icons.view_carousel,
+            imagePath: 'assets/templates/instagram/instagram-template1.png',
           ),
           TemplateType(
             name: 'Reel Script',
             description: 'Short video script with hooks',
             icon: Icons.video_library,
+            imagePath: 'assets/templates/instagram/instagram-template2.png',
           ),
           TemplateType(
             name: 'Story Series',
             description: 'Multiple story frames',
             icon: Icons.auto_stories,
+            imagePath: 'assets/templates/instagram/instagram-template3.png',
           ),
         ];
       case 'LinkedIn':
@@ -119,11 +122,13 @@ Make each version unique and optimized for its specific format. Be creative and 
             name: 'Professional Post',
             description: 'Thought leadership content',
             icon: Icons.work,
+            imagePath: 'assets/templates/linkedin/linkedin-template1.png',
           ),
           TemplateType(
             name: 'Carousel Article',
             description: 'Multi-slide professional insights',
             icon: Icons.article,
+            imagePath: 'assets/templates/linkedin/linkedin-template2.png',
           ),
         ];
       case 'Facebook':
@@ -132,11 +137,13 @@ Make each version unique and optimized for its specific format. Be creative and 
             name: 'Engaging Post',
             description: 'Community-focused content',
             icon: Icons.photo,
+            imagePath: 'assets/templates/facebook/facebook-template1.png',
           ),
           TemplateType(
             name: 'Video Post',
             description: 'Video content with description',
             icon: Icons.videocam,
+            imagePath: 'assets/templates/facebook/facebook-template2.png',
           ),
         ];
       default:
@@ -390,6 +397,7 @@ Make each version unique and optimized for its specific format. Be creative and 
 
           const SizedBox(height: 24),
 
+          // UPDATED: Container with actual template image
           Container(
             width: 280,
             decoration: BoxDecoration(
@@ -405,34 +413,44 @@ Make each version unique and optimized for its specific format. Be creative and 
             ),
             child: Column(
               children: [
-                Container(
-                  width: 280,
-                  height: 400,
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceVariant,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
+                // UPDATED: Template image from assets
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.image_outlined,
-                        size: 80,
-                        color: colorScheme.onSurface.withOpacity(0.3),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Post Preview',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: colorScheme.onSurface.withOpacity(0.6),
-                          fontWeight: FontWeight.w600,
+                  child: Image.asset(
+                    template.type.imagePath,
+                    width: 280,
+                    height: 400,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback if image doesn't load
+                      return Container(
+                        width: 280,
+                        height: 400,
+                        color: colorScheme.surfaceVariant,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.image_outlined,
+                              size: 80,
+                              color: colorScheme.onSurface.withOpacity(0.3),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Post Preview',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: colorScheme.onSurface.withOpacity(0.6),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
 
@@ -532,11 +550,13 @@ class TemplateType {
   final String name;
   final String description;
   final IconData icon;
+  final String imagePath;  // ADDED: Image path field
 
   TemplateType({
     required this.name,
     required this.description,
     required this.icon,
+    required this.imagePath,  // ADDED: Required image path
   });
 }
 
