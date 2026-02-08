@@ -9,6 +9,9 @@ import 'package:coco_app/presentation/screens/chat_screen.dart';
 import 'package:coco_app/data/services/auth_service.dart';
 import 'package:coco_app/presentation/screens/review_screen.dart';
 import 'package:coco_app/data/services/review_service.dart';
+import 'package:coco_app/data/services/schedule_service.dart';
+import 'package:coco_app/domain/models/scheduled_post_model.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -75,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ------------------------------------------------------
-// DASHBOARD SCREEN — WITH DYNAMIC USER NAME
+// DASHBOARD SCREEN — WITH DYNAMIC USER NAME AND CALENDAR
 // ------------------------------------------------------
 
 class DashboardScreen extends StatefulWidget {
@@ -89,12 +92,17 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final _authService = AuthService();
+  final _scheduleService = ScheduleService();
+
   String _userName = 'Loading...';
+  List<ScheduledPost> _scheduledPosts = [];
+  bool _isLoadingPosts = true;
 
   @override
   void initState() {
     super.initState();
     _loadUserInfo();
+    _loadScheduledPosts();
   }
 
   Future<void> _loadUserInfo() async {
@@ -104,6 +112,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _userName = user['name'] ?? 'User';
       });
     }
+  }
+
+  Future<void> _loadScheduledPosts() async {
+    try {
+      final posts = await _scheduleService.getAllScheduledPosts();
+      if (mounted) {
+        setState(() {
+          _scheduledPosts = posts;
+          _isLoadingPosts = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoadingPosts = false;
+        });
+      }
+    }
+  }
+  List<ScheduledPost> get _todaysPosts {
+    final now = DateTime.now();
+    return _scheduledPosts.where((post) {
+      return post.date.year == now.year &&
+          post.date.month == now.month &&
+          post.date.day == now.day;
+    }).toList()
+      ..sort((a, b) {
+        // Sort by time string (format: "HH:mm")
+        // Handle null times by putting them at the end
+        if (a.time == null && b.time == null) return 0;
+        if (a.time == null) return 1;
+        if (b.time == null) return -1;
+        return a.time!.compareTo(b.time!);
+      });
+  }
+
+  List<ScheduledPost> get _upcomingPosts {
+    final now = DateTime.now();
+    return _scheduledPosts.where((post) {
+      return post.date.isAfter(now);
+    }).toList()
+      ..sort((a, b) {
+        // First sort by date, then by time
+        final dateCompare = a.date.compareTo(b.date);
+        if (dateCompare != 0) return dateCompare;
+
+        // Handle null times
+        if (a.time == null && b.time == null) return 0;
+        if (a.time == null) return 1;
+        if (b.time == null) return -1;
+        return a.time!.compareTo(b.time!);
+      });
   }
 
   @override
@@ -257,6 +317,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _calendarCard(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+    final dateFormat = DateFormat('MMMM d, yyyy');
+    final todayPosts = _todaysPosts;
+    final upcomingPosts = _upcomingPosts;
 
     return CustomCard(
       child: Column(
@@ -272,29 +336,130 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text('28th January, 2026', style: AppTextStyles.caption),
+          Text(dateFormat.format(now), style: AppTextStyles.caption),
           const SizedBox(height: 12),
 
-          _calendarItem('Instagram Reel', 'scheduled for 14:30'),
-          _calendarItem('LinkedIn Post', 'scheduled for 18:45'),
+          // Loading state
+          if (_isLoadingPosts)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(cs.primary),
+                ),
+              ),
+            )
 
-          const Divider(height: 24),
+          // No posts scheduled
+          else if (_scheduledPosts.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      size: 40,
+                      color: cs.onSurface.withOpacity(0.3),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'No posts scheduled yet',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: cs.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: () => widget.onNavigate(2),
+                      child: Text(
+                        'Create your first post',
+                        style: TextStyle(
+                          color: cs.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
 
-          Text('Next Upcoming',
-              style: AppTextStyles.bodySmall
-                  .copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
+          // Show today's posts
+          else ...[
+              if (todayPosts.isNotEmpty) ...[
+                Text(
+                  'Today (${todayPosts.length})',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: cs.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...todayPosts.take(2).map((post) => _calendarItem(
+                  '${post.platform} - ${post.topic}',
+                  'scheduled for ${post.time}',
+                  cs.primary,
+                )),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    'No posts scheduled for today',
+                    style: AppTextStyles.caption.copyWith(
+                      color: cs.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                ),
+              ],
 
-          _calendarItem(
-            'Instagram Post - Eco-friendly materials',
-            'Jan 31 at 10:00',
-          ),
+              if (todayPosts.isNotEmpty && upcomingPosts.isNotEmpty)
+                const Divider(height: 24),
+
+              // Show upcoming posts
+              if (upcomingPosts.isNotEmpty) ...[
+                Text(
+                  'Upcoming',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...upcomingPosts.take(2).map((post) {
+                  final postDate = DateFormat('MMM d').format(post.date);
+                  return _calendarItem(
+                    '${post.platform} - ${post.topic}',
+                    '$postDate at ${post.time}',
+                    Colors.orange,
+                  );
+                }),
+              ],
+
+              // Show total count if more posts exist
+              if (_scheduledPosts.length > 4) ...[
+                const SizedBox(height: 8),
+                Center(
+                  child: TextButton(
+                    onPressed: () => widget.onNavigate(3),
+                    child: Text(
+                      'View all ${_scheduledPosts.length} scheduled posts',
+                      style: TextStyle(
+                        color: cs.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
         ],
       ),
     );
   }
 
-  Widget _calendarItem(String title, String subtitle) {
+  Widget _calendarItem(String title, String subtitle, Color indicatorColor) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -303,7 +468,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             width: 3,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.green,
+              color: indicatorColor,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -312,9 +477,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: AppTextStyles.bodySmall
-                        .copyWith(fontWeight: FontWeight.w600)),
+                Text(
+                  title,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 Text(subtitle, style: AppTextStyles.caption),
               ],
             ),
