@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../data/services/ai_chat_service.dart';
+import '../../data/services/auth_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'template_selection_screen.dart';
 import 'home_screen.dart';
@@ -29,22 +30,32 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
   final ScrollController _scrollController = ScrollController();
   late List<ChatMessage> _messages;
   final AiChatService _aiService = AiChatService();
+  final AuthService _authService = AuthService();
   bool _isLoading = false;
+  String _userName = '';
 
   @override
   void initState() {
     super.initState();
+    _loadUserName();
+  }
 
-    _messages = [
-      ChatMessage(
-        id: 'welcome',
-        content: "Hi Lena! I'm ready to help you create an amazing ${widget.occasion.toLowerCase()} for ${widget.platform}. ${widget.initialMessages.last.content}",
-        isUser: false,
-        timestamp: DateTime.now(),
-      ),
-    ];
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+  Future<void> _loadUserName() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null && mounted) {
+      setState(() {
+        _userName = user['name']?.split(' ').first ?? 'there';
+        _messages = [
+          ChatMessage(
+            id: 'welcome',
+            content: "Hi $_userName! I'm ready to help you create an amazing ${widget.occasion.toLowerCase()} for ${widget.platform}. ${widget.initialMessages.last.content}",
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        ];
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+    }
   }
 
   void _navigateToTemplates() {

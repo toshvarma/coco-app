@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/services/ai_chat_service.dart';
+import '../../data/services/auth_service.dart';
 import '../../domain/models/chat_message_model.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -15,18 +16,29 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
   final AiChatService _aiService = AiChatService();
+  final AuthService _authService = AuthService();
   bool _isLoading = false;
+  String _userName = '';
 
   @override
   void initState() {
     super.initState();
-    // Add welcome message
-    _messages.add(ChatMessage(
-      id: DateTime.now().toString(),
-      content: "Hi Lena! I'm COCO, your AI social media assistant. How can I help you create amazing content today?",
-      isUser: false,
-      timestamp: DateTime.now(),
-    ));
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null && mounted) {
+      setState(() {
+        _userName = user['name']?.split(' ').first ?? 'there';
+        _messages.add(ChatMessage(
+          id: DateTime.now().toString(),
+          content: "Hi $_userName! I'm COCO, your AI social media assistant. How can I help you create amazing content today?",
+          isUser: false,
+          timestamp: DateTime.now(),
+        ));
+      });
+    }
   }
 
   Future<void> _sendMessage() async {
