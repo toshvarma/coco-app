@@ -152,10 +152,10 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: colorScheme.secondaryContainer,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.close, color: colorScheme.onPrimary),
+          icon: Icon(Icons.close, color: colorScheme.onPrimary),  // White icon
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -168,19 +168,21 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
           children: [
             Text(
               'AI Content Creator',
-              style: TextStyle(color: colorScheme.onPrimary),
+              style: TextStyle(color: colorScheme.onPrimary),  // White text
             ),
             Text(
               '${widget.platform} • ${widget.occasion}',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                color: colorScheme.onPrimary.withOpacity(0.9),
+                color: colorScheme.onPrimary.withOpacity(0.9),  // White text with opacity
               ),
             ),
           ],
         ),
-        backgroundColor: colorScheme.primaryContainer,
+        backgroundColor: colorScheme.primary,  // Changed from onPrimaryContainer to primary (dark green)
+        foregroundColor: colorScheme.onPrimary,  // Added this for white text
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),  // Added this for white icons
         elevation: 0,
         actions: [
           Padding(

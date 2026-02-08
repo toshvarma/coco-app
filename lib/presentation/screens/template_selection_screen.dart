@@ -211,18 +211,18 @@ Make each version unique and optimized for its specific format. Be creative and 
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onPrimaryContainer,
+        backgroundColor: colorScheme.primary,  // Dark green background
+        foregroundColor: colorScheme.onPrimary,  // White text
         elevation: 0,
         title: Text(
           'Choose Your Template',
           style: TextStyle(
-            color: colorScheme.onPrimaryContainer,
+            color: colorScheme.onPrimary,  // White text
             fontWeight: FontWeight.bold,
           ),
         ),
         iconTheme: IconThemeData(
-          color: colorScheme.onPrimaryContainer,
+          color: colorScheme.onPrimary,  // White icons (back button)
         ),
         actions: [
           if (!_isLoading && _generatedTemplates.isNotEmpty)

@@ -49,7 +49,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
       backgroundColor: colorScheme.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: Icon(Icons.close, color: colorScheme.onPrimary),  // Explicitly set to white
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -58,8 +58,9 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
           },
         ),
         title: const Text('Create New Post'),
-        backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onSecondaryContainer,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),  // Also set iconTheme
         elevation: 0,
       ),
       body: SingleChildScrollView(

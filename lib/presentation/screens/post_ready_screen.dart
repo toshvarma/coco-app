@@ -3,6 +3,7 @@ import '../../core/constants/colors.dart';
 import '../../data/services/schedule_service.dart';
 import '../../domain/models/scheduled_post_model.dart';
 import 'home_screen.dart';
+import 'package:flutter/material.dart';
 
 class PostReadyScreen extends StatelessWidget {
   final String platform;
@@ -20,21 +21,26 @@ class PostReadyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.primary,  // Dark green background
+        foregroundColor: colorScheme.onPrimary,  // White text
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: AppColors.primarygreen),
+          icon: Icon(Icons.close, color: colorScheme.onPrimary),  // White close icon
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Your Post',
           style: TextStyle(
-            color: AppColors.primarygreen,
+            color: colorScheme.onPrimary,  // White text
             fontWeight: FontWeight.bold,
           ),
+        ),
+        iconTheme: IconThemeData(
+          color: colorScheme.onPrimary,  // White icons
         ),
       ),
       body: SafeArea(
