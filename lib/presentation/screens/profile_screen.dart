@@ -3,9 +3,36 @@ import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
 import 'package:provider/provider.dart';
 import 'package:coco_app/data/services/theme_service.dart';
+import 'package:coco_app/data/services/auth_service.dart';
+import 'package:coco_app/presentation/screens/login_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _authService = AuthService();
+  String _userName = 'Loading...';
+  String _userEmail = 'Loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserInfo();
+  }
+
+  Future<void> _loadUserInfo() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null) {
+      setState(() {
+        _userName = user['name'] ?? 'User';
+        _userEmail = user['email'] ?? '';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,14 +62,14 @@ class ProfileScreen extends StatelessWidget {
                   context,
                   icon: Icons.edit_outlined,
                   title: 'Edit Name',
-                  subtitle: 'Lena Hoffman',
+                  subtitle: _userName,
                   onTap: () => _showEditDialog(context, 'Name'),
                 ),
                 _buildMenuItem(
                   context,
                   icon: Icons.email_outlined,
                   title: 'Email Address',
-                  subtitle: 'Lena Hoffman@outlook.com',
+                  subtitle: _userEmail,
                   onTap: () => _showEditDialog(context, 'Email'),
                 ),
                 _buildMenuItem(
@@ -70,21 +97,21 @@ class ProfileScreen extends StatelessWidget {
                   context,
                   platform: 'Instagram',
                   isConnected: true,
-                  username: '@Lena_Hoffman',
+                  username: '@${_userName.replaceAll(' ', '_')}',
                   color: const Color(0xFFE4405F),
                 ),
                 _buildPlatformItem(
                   context,
                   platform: 'Facebook',
                   isConnected: true,
-                  username: 'Lena Hoffman',
+                  username: _userName,
                   color: const Color(0xFF1877F2),
                 ),
                 _buildPlatformItem(
                   context,
                   platform: 'LinkedIn',
                   isConnected: true,
-                  username: 'Lena Hoffman',
+                  username: _userName,
                   color: const Color(0xFF0A66C2),
                 ),
                 _buildPlatformItem(
@@ -212,7 +239,7 @@ class ProfileScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Ichbin Architekt',
+                  _userName,
                   style: AppTextStyles.heading3.copyWith(
                     color: colorScheme.onSurface,
                   ),
@@ -723,8 +750,6 @@ class ProfileScreen extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, String field) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -765,12 +790,24 @@ class ProfileScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              // Close the dialog first
               Navigator.pop(context);
-              // TODO: Implement logout logic
+
+              // Logout
+              await _authService.logout();
+
+              // Navigate to login screen
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (route) => false,
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.error,
+              foregroundColor: Colors.white,
             ),
             child: const Text('Log Out'),
           ),

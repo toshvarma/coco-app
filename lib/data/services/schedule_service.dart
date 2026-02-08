@@ -1,17 +1,29 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/scheduled_post_model.dart';
 
 class ScheduleService {
-  static const String _baseUrl = 'http://10.0.2.2:3000/api/posts'; // Change for mobile: http://10.0.2.2:3000/api/posts
+  static const String _baseUrl = 'http://10.0.2.2:3000/api/posts';
+  //static const String _baseUrl = 'http://localhost:3000/api/posts';
+
+  Future<String> _getUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userEmail') ?? '';
+  }
 
   // Schedule a post
   Future<bool> schedulePost(ScheduledPost post) async {
     try {
+      final userEmail = await _getUserEmail();
+
       final response = await http.post(
         Uri.parse('$_baseUrl/schedule'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(post.toJson()),
+        body: jsonEncode({
+          'userEmail': userEmail,
+          'post': post.toJson(),
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -28,8 +40,10 @@ class ScheduleService {
   // Get all scheduled posts
   Future<List<ScheduledPost>> getAllScheduledPosts() async {
     try {
+      final userEmail = await _getUserEmail();
+
       final response = await http.get(
-        Uri.parse('$_baseUrl/scheduled'),
+        Uri.parse('$_baseUrl/scheduled/$userEmail'),
       );
 
       if (response.statusCode == 200) {
@@ -49,8 +63,10 @@ class ScheduleService {
   // Delete a post
   Future<bool> deletePost(String postId) async {
     try {
+      final userEmail = await _getUserEmail();
+
       final response = await http.delete(
-        Uri.parse('$_baseUrl/scheduled/$postId'),
+        Uri.parse('$_baseUrl/scheduled/$userEmail/$postId'),
       );
 
       if (response.statusCode == 200) {

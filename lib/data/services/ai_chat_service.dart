@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AiChatService {
   static const String _baseUrl = 'http://10.0.2.2:3000/api/chat';
@@ -10,6 +11,10 @@ class AiChatService {
         List<Map<String, String>>? chatHistory,
       }) async {
     try {
+      // Get current user email
+      final prefs = await SharedPreferences.getInstance();
+      final userEmail = prefs.getString('userEmail') ?? '';
+
       List<Map<String, String>> messages = [];
 
       if (chatHistory != null) {
@@ -30,6 +35,7 @@ class AiChatService {
         },
         body: jsonEncode({
           'messages': messages,
+          'userEmail': userEmail,
           'system': 'You are COCO, a helpful AI assistant for social media content creation. You help interior designers create engaging posts for Instagram, Facebook, LinkedIn, and TikTok. Be creative, professional, and concise.',
         }),
       );

@@ -6,18 +6,63 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// In-memory storage for scheduled posts (resets when server restarts)
-let scheduledPosts = [];
+// In-memory user accounts
+const users = {
+  'lena@coco.com': {
+    password: 'password1',
+    name: 'Lena Hoffman',
+    scheduledPosts: []
+  },
+  'mike@coco.com': {
+    password: 'password2',
+    name: 'Mike Murga',
+    scheduledPosts: []
+  }
+};
 
 app.get('/health', (req, res) => {
   res.json({ status: 'Server is running!' });
 });
 
+// Login endpoint
+app.post('/api/auth/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    console.log('🔐 Login attempt for:', email);
+
+    if (users[email] && users[email].password === password) {
+      res.json({
+        success: true,
+        user: {
+          email: email,
+          name: users[email].name
+        }
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: 'Invalid email or password'
+      });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 app.post('/api/chat', async (req, res) => {
   try {
-    const { messages, system } = req.body;
+    const { messages, system, userEmail } = req.body;
 
     console.log('Received chat request');
+
+    // Get user's name for personalization
+    const userName = users[userEmail]?.name || 'there';
+    const personalizedSystem = system.replace('You are COCO', `You are COCO, speaking to ${userName}`);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -30,7 +75,7 @@ app.post('/api/chat', async (req, res) => {
         model: 'claude-sonnet-4-5-20250929',
         max_tokens: 1024,
         messages: messages,
-        system: system || 'You are COCO, a helpful AI assistant for social media content creation.',
+        system: personalizedSystem || `You are COCO, a helpful AI assistant for social media content creation speaking to ${userName}.`,
       }),
     });
 
@@ -52,13 +97,21 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// NEW: Schedule a post
+// Schedule a post (user-specific)
 app.post('/api/posts/schedule', (req, res) => {
   try {
-    console.log('📝 Scheduling new post:', req.body);
+    const { userEmail, post } = req.body;
 
-    const post = req.body;
-    scheduledPosts.push(post);
+    console.log('📝 Scheduling new post for:', userEmail);
+
+    if (!users[userEmail]) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    users[userEmail].scheduledPosts.push(post);
 
     res.json({
       success: true,
@@ -74,13 +127,23 @@ app.post('/api/posts/schedule', (req, res) => {
   }
 });
 
-// NEW: Get all scheduled posts
-app.get('/api/posts/scheduled', (req, res) => {
+// Get all scheduled posts (user-specific)
+app.get('/api/posts/scheduled/:userEmail', (req, res) => {
   try {
-    console.log('📅 Fetching all scheduled posts');
+    const { userEmail } = req.params;
+
+    console.log('📅 Fetching scheduled posts for:', userEmail);
+
+    if (!users[userEmail]) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
     res.json({
       success: true,
-      posts: scheduledPosts
+      posts: users[userEmail].scheduledPosts
     });
   } catch (error) {
     console.error('Error fetching posts:', error);
@@ -91,13 +154,23 @@ app.get('/api/posts/scheduled', (req, res) => {
   }
 });
 
-// NEW: Delete a scheduled post
-app.delete('/api/posts/scheduled/:id', (req, res) => {
+// Delete a scheduled post (user-specific)
+app.delete('/api/posts/scheduled/:userEmail/:id', (req, res) => {
   try {
-    const { id } = req.params;
-    console.log('🗑️ Deleting post:', id);
+    const { userEmail, id } = req.params;
 
-    scheduledPosts = scheduledPosts.filter(post => post.id !== id);
+    console.log('🗑️ Deleting post:', id, 'for user:', userEmail);
+
+    if (!users[userEmail]) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    users[userEmail].scheduledPosts = users[userEmail].scheduledPosts.filter(
+      post => post.id !== id
+    );
 
     res.json({
       success: true,
@@ -116,4 +189,7 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 COCO Backend running on http://localhost:${PORT}`);
   console.log(`✅ Ready to receive chat requests`);
+  console.log(`👥 Available accounts:`);
+  console.log(`   - lena@coco.com / password1 (Lena Hoffman)`);
+  console.log(`   - mike@coco.com / password2 (Mike Murga)`);
 });
