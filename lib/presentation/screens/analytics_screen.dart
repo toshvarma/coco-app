@@ -177,7 +177,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       child: Column(
         children: [
           Text('Latest Post', style: AppTextStyles.bodySmall),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             _userStats['latestPostViews'] ?? '0',
             style: AppTextStyles.heading3.copyWith(
