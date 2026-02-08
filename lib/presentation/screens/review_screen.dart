@@ -1,91 +1,138 @@
 import 'package:flutter/material.dart';
-import '../../data/services/review_service.dart';
-import '../../domain/models/review_model.dart';
+import 'package:coco_app/core/constants/text_styles.dart';
+import 'package:coco_app/core/widgets/custom_card.dart';
+import 'package:coco_app/domain/models/review_model.dart';
 
 class ReviewScreen extends StatelessWidget {
-  final String personaId;
+  final ReviewData reviewData;
 
   const ReviewScreen({
     super.key,
-    required this.personaId,
+    required this.reviewData,
   });
 
   @override
   Widget build(BuildContext context) {
-    final ReviewData reviewData =
-    ReviewService().getReviewForUser(personaId);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
-        title: const Text("Let’s Review"),
+        title: const Text('Your Review'),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Greeting Card
+              _buildGreetingCard(context),
+              const SizedBox(height: 16),
+
+              // Review Sections
+              ...(reviewData.sections.map((section) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _buildReviewSection(context, section),
+              ))),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGreetingCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return CustomCard(
+      padding: const EdgeInsets.all(20),
+      child: Row(
         children: [
-          _GreetingCard(text: reviewData.greeting),
-          const SizedBox(height: 16),
-          ...reviewData.sections.map(
-                (section) => _ReviewSectionCard(section: section),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.star_rounded,
+              color: colorScheme.primary,
+              size: 32,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              reviewData.greeting,
+              style: AppTextStyles.heading3.copyWith(
+                color: colorScheme.onSurface,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-class _GreetingCard extends StatelessWidget {
-  final String text;
+  Widget _buildReviewSection(BuildContext context, ReviewSection section) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-  const _GreetingCard({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-      ),
-    );
-  }
-}
-
-class _ReviewSectionCard extends StatelessWidget {
-  final ReviewSection section;
-
-  const _ReviewSectionCard({required this.section});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${section.emoji} ${section.title}",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            ...section.points.map(
-                  (point) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("• "),
-                    Expanded(child: Text(point)),
-                  ],
+    return CustomCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                section.emoji,
+                style: const TextStyle(fontSize: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  section.title,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: colorScheme.onSurface,
+                  ),
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...section.points.map((point) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 6),
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    point,
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: colorScheme.onSurface,
+                      height: 1.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          )),
+        ],
       ),
     );
   }

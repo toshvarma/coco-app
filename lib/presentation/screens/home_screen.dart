@@ -8,6 +8,7 @@ import 'package:coco_app/presentation/screens/profile_screen.dart';
 import 'package:coco_app/presentation/screens/chat_screen.dart';
 import 'package:coco_app/data/services/auth_service.dart';
 import 'package:coco_app/presentation/screens/review_screen.dart';
+import 'package:coco_app/data/services/review_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -239,10 +240,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           _arrow(context, () {
+            // Get the review data for the current user
+            final reviewData = ReviewService().getReviewForUser(_userName == 'Lena Hoffman' ? 'lena' : 'mike');
+
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const ReviewScreen(personaId: 'lena'),
+                builder: (_) => ReviewScreen(reviewData: reviewData),
               ),
             );
           }),

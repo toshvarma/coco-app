@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
 import 'package:coco_app/presentation/screens/review_screen.dart';
+import 'package:coco_app/data/services/review_service.dart';
+import 'package:coco_app/data/services/auth_service.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -12,6 +14,33 @@ class AnalyticsScreen extends StatefulWidget {
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
   String selectedPlatform = 'Instagram';
+
+  // NEW: Add these variables
+  final ReviewService _reviewService = ReviewService();
+  final AuthService _authService = AuthService();
+  String _personaId = 'lena'; // default
+
+  // NEW: Add this method
+  @override
+  void initState() {
+    super.initState();
+    _loadUserPersona();
+  }
+
+  // NEW: This method detects which user is logged in
+  Future<void> _loadUserPersona() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null && mounted) {
+      setState(() {
+        // Check the email and set the persona ID
+        if (user['email'] == 'mike@coco.com') {
+          _personaId = 'mike';
+        } else if (user['email'] == 'lena@coco.com') {
+          _personaId = 'lena';
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +81,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             _buildFollowersChart(),
             const SizedBox(height: 24),
 
-            // Convert to Value Card
+            // UPDATED: Convert to Value Card with working navigation
             _buildConvertCard(),
           ],
         ),
@@ -326,47 +355,63 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     );
   }
 
+  // UPDATED: This card now has a working button
   Widget _buildConvertCard() {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return CustomCard(
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Let's convert this to more value",
-                  style: AppTextStyles.bodySmall.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'View our feedback and recommendations based on your statistics.',
-                  style: AppTextStyles.caption.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.7),
-                  ),
-                ),
-              ],
-            ),
+    return InkWell(
+      onTap: () {
+        // Get the review data for the current user
+        final reviewData = _reviewService.getReviewForUser(_personaId);
+
+        // Navigate to review screen with the data
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReviewScreen(reviewData: reviewData),
           ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+        );
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: CustomCard(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Let's convert this to more value",
+                    style: AppTextStyles.bodySmall.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'View our feedback and recommendations based on your statistics.',
+                    style: AppTextStyles.caption.copyWith(
+                      color: colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            child: Icon(
-              Icons.arrow_downward,
-              color: colorScheme.primary,
-              size: 20,
+            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.arrow_forward,
+                color: colorScheme.primary,
+                size: 20,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
