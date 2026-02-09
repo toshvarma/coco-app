@@ -13,7 +13,7 @@ class CalendarScreenWithNavbar extends StatefulWidget {
 }
 
 class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
-  final ScheduleService _scheduleService = ScheduleService(); // Changed from PostStorageService
+  final ScheduleService _scheduleService = ScheduleService();
   int? selectedDay;
   Map<int, List<ScheduledPost>> scheduledPosts = {};
   bool isLoading = true;
@@ -27,11 +27,143 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     _loadPosts();
   }
 
+  // Hard-coded mock data
+  List<ScheduledPost> _getMockData() {
+    return [
+      // January posts
+      ScheduledPost(
+        id: '1',
+        platform: 'Instagram',
+        topic: 'New Year, New Space mood board',
+        date: DateTime(2026, 1, 3),
+        time: '10:00',
+      ),
+      ScheduledPost(
+        id: '2',
+        platform: 'Facebook',
+        topic: 'Repost of Jan 3',
+        note: 'No notes',
+        date: DateTime(2026, 1, 6),
+        time: '14:00',
+      ),
+      ScheduledPost(
+        id: '3',
+        platform: 'Instagram',
+        topic: 'Living room before/after carousel',
+        note: 'Client approved sharing photos',
+        date: DateTime(2026, 1, 9),
+        time: '11:30',
+      ),
+      ScheduledPost(
+        id: '4',
+        platform: 'LinkedIn',
+        topic: 'What interior design taught me about project management',
+        date: DateTime(2026, 1, 13),
+        time: '09:00',
+      ),
+      ScheduledPost(
+        id: '5',
+        platform: 'Instagram',
+        topic: 'Material spotlight: natural stone',
+        note: 'Use softer tone, less technical',
+        date: DateTime(2026, 1, 16),
+        time: '15:00',
+      ),
+      ScheduledPost(
+        id: '6',
+        platform: 'Facebook',
+        topic: 'Client testimonial (text-heavy)',
+        date: DateTime(2026, 1, 20),
+        time: '12:00',
+      ),
+      ScheduledPost(
+        id: '7',
+        platform: 'Instagram',
+        topic: 'Lighting mistakes in small apartments',
+        date: DateTime(2026, 1, 24),
+        time: '16:00',
+      ),
+      ScheduledPost(
+        id: '8',
+        platform: 'Instagram',
+        topic: 'Post about eco-friendly materials. Add example from recent project.',
+        note: 'Draft - needs final review',
+        isDraft: true,
+        date: DateTime(2026, 1, 31),
+        time: '10:00',
+      ),
+
+      // February posts
+      ScheduledPost(
+        id: '9',
+        platform: 'Instagram',
+        topic: 'Valentine\'s Day color palettes for the bedroom',
+        date: DateTime(2026, 2, 2),
+        time: '10:00',
+      ),
+      ScheduledPost(
+        id: '10',
+        platform: 'LinkedIn',
+        topic: 'Working with difficult clients: a designer\'s perspective',
+        note: 'Keep professional tone',
+        date: DateTime(2026, 2, 5),
+        time: '09:00',
+      ),
+      ScheduledPost(
+        id: '11',
+        platform: 'Facebook',
+        topic: 'Behind the scenes: kitchen renovation progress',
+        date: DateTime(2026, 2, 9),
+        time: '14:00',
+      ),
+      ScheduledPost(
+        id: '12',
+        platform: 'Instagram',
+        topic: 'Spring 2026 interior design trends',
+        note: 'Include trending colors and textures',
+        date: DateTime(2026, 2, 12),
+        time: '11:30',
+      ),
+      ScheduledPost(
+        id: '13',
+        platform: 'Instagram',
+        topic: 'Budget-friendly home office makeover tips',
+        date: DateTime(2026, 2, 14),
+        time: '15:00',
+      ),
+      ScheduledPost(
+        id: '14',
+        platform: 'LinkedIn',
+        topic: 'The ROI of good design for commercial spaces',
+        date: DateTime(2026, 2, 16),
+        time: '09:00',
+      ),
+      ScheduledPost(
+        id: '15',
+        platform: 'Facebook',
+        topic: 'Client spotlight and testimonial',
+        note: 'Waiting for client approval',
+        date: DateTime(2026, 2, 17),
+        time: '12:00',
+      ),
+      ScheduledPost(
+        id: '16',
+        platform: 'Instagram',
+        topic: 'Bathroom tile ideas: modern vs. classic',
+        date: DateTime(2026, 2, 17),
+        time: '16:00',
+      ),
+    ];
+  }
+
   Future<void> _loadPosts() async {
     setState(() => isLoading = true);
 
-    // Fetch all posts from backend
-    final allPosts = await _scheduleService.getAllScheduledPosts();
+    // Fetch posts from backend
+    final backendPosts = await _scheduleService.getAllScheduledPosts();
+
+    // Combine mock data with backend posts
+    final allPosts = [..._getMockData(), ...backendPosts];
 
     // Group posts by day for current month
     final Map<int, List<ScheduledPost>> groupedPosts = {};
