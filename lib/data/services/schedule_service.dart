@@ -6,8 +6,8 @@ import '../../domain/models/scheduled_post_model.dart';
 class ScheduleService {
   // USE ONE OF THESE THREE PORTS TO RUN ON EMULATOR, WEB BROWSER, OR ANDROID DEVICE
   //static const String _baseUrl = 'http://10.0.2.2:3000/api/posts';
-  //static const String _baseUrl = 'http://localhost:3000/api/posts';
-  static const String _baseUrl = 'http://10.19.79.35:3000/api/posts';
+  static const String _baseUrl = 'http://localhost:3000/api/posts';
+  //static const String _baseUrl = 'http://10.19.79.35:3000/api/posts';
 
   Future<String> _getUserEmail() async {
     final prefs = await SharedPreferences.getInstance();

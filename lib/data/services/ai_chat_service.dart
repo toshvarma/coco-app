@@ -5,8 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AiChatService {
   // USE ONE OF THESE THREE PORTS TO RUN ON EMULATOR, WEB BROWSER, OR ANDROID DEVICE
   //static const String _baseUrl = 'http://10.0.2.2:3000/api/chat';
-  //static const String _baseUrl = 'http://localhost:3000/api/chat';
-  static const String _baseUrl = 'http://10.19.79.35:3000/api/chat';
+  static const String _baseUrl = 'http://localhost:3000/api/chat';
+  //static const String _baseUrl = 'http://10.19.79.35:3000/api/chat';
 
   Future<String> sendMessage(
       String userMessage, {
