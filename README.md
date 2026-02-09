@@ -1,11 +1,11 @@
 
-# COCO App
+# COCO App - AI Guided Posting System
 
 ## Project Description
 
-COCO is a university project developed by **Tosh Varma** and **Leonhard Richartz**. The project focuses on building an AI guided posting system that assists self employed users and small to medium sized enterprises in managing their social media content.
+This is a university project developed by **Tosh Varma** and **Leonhard Richartz**. The project focuses on building an AI guided posting system that assists self employed users and small to medium sized enterprises in managing their social media content.
 
-Many self employed professionals and SMEs lack the time and technical background required to plan posts, generate content, and maintain consistency across platforms. COCO addresses this problem by providing guided workflows and an AI chat client that supports content ideation, drafting, and post scheduling.
+Many self employed professionals and SMEs lack the time and technical background required to plan posts, generate content, and maintain consistency across platforms. We address this problem by providing guided workflows and an AI chat client that supports content ideation, drafting, and post scheduling.
 
 This repository contains both the Flutter mobile application and the Node.js backend used during development.
 
