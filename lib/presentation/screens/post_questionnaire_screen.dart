@@ -519,7 +519,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
             const SizedBox(width: 8),
             Text(
               _selectedImages.isNotEmpty
-                  ? 'Start Creating with Images'
+                  ? 'Start Creating with COCO'
                   : 'Start Creating with COCO',
               style: const TextStyle(
                 fontSize: 16,
