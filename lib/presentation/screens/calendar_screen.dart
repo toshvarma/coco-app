@@ -3,6 +3,7 @@ import 'package:coco_app/core/constants/text_styles.dart';
 import 'package:coco_app/core/widgets/custom_card.dart';
 import 'package:coco_app/domain/models/scheduled_post_model.dart';
 import 'package:coco_app/data/services/schedule_service.dart';
+import 'package:coco_app/data/services/auth_service.dart';
 import 'package:coco_app/core/widgets/add_post_dialog.dart';
 
 class CalendarScreenWithNavbar extends StatefulWidget {
@@ -14,9 +15,12 @@ class CalendarScreenWithNavbar extends StatefulWidget {
 
 class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   final ScheduleService _scheduleService = ScheduleService();
+  final AuthService _authService = AuthService();
+
   int? selectedDay;
   Map<int, List<ScheduledPost>> scheduledPosts = {};
   bool isLoading = true;
+  String _personaId = 'lena';
 
   int currentYear = 2026;
   int currentMonth = 2; // February
@@ -24,22 +28,36 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   @override
   void initState() {
     super.initState();
+    _loadUserPersona();
+  }
+
+  Future<void> _loadUserPersona() async {
+    final user = await _authService.getCurrentUser();
+    if (user != null && mounted) {
+      setState(() {
+        if (user['email'] == 'mike@coco.com') {
+          _personaId = 'mike';
+        } else {
+          _personaId = 'lena';
+        }
+      });
+    }
     _loadPosts();
   }
 
-  // Hard-coded mock data
-  List<ScheduledPost> _getMockData() {
+  // Hard-coded mock data for Lena
+  List<ScheduledPost> _getLenaMockPosts() {
     return [
       // January posts
       ScheduledPost(
-        id: '1',
+        id: 'lena_1',
         platform: 'Instagram',
         topic: 'New Year, New Space mood board',
         date: DateTime(2026, 1, 3),
         time: '10:00',
       ),
       ScheduledPost(
-        id: '2',
+        id: 'lena_2',
         platform: 'Facebook',
         topic: 'Repost of Jan 3',
         note: 'No notes',
@@ -47,7 +65,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '14:00',
       ),
       ScheduledPost(
-        id: '3',
+        id: 'lena_3',
         platform: 'Instagram',
         topic: 'Living room before/after carousel',
         note: 'Client approved sharing photos',
@@ -55,14 +73,14 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '11:30',
       ),
       ScheduledPost(
-        id: '4',
+        id: 'lena_4',
         platform: 'LinkedIn',
         topic: 'What interior design taught me about project management',
         date: DateTime(2026, 1, 13),
         time: '09:00',
       ),
       ScheduledPost(
-        id: '5',
+        id: 'lena_5',
         platform: 'Instagram',
         topic: 'Material spotlight: natural stone',
         note: 'Use softer tone, less technical',
@@ -70,21 +88,21 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '15:00',
       ),
       ScheduledPost(
-        id: '6',
+        id: 'lena_6',
         platform: 'Facebook',
         topic: 'Client testimonial (text-heavy)',
         date: DateTime(2026, 1, 20),
         time: '12:00',
       ),
       ScheduledPost(
-        id: '7',
+        id: 'lena_7',
         platform: 'Instagram',
         topic: 'Lighting mistakes in small apartments',
         date: DateTime(2026, 1, 24),
         time: '16:00',
       ),
       ScheduledPost(
-        id: '8',
+        id: 'lena_8',
         platform: 'Instagram',
         topic: 'Post about eco-friendly materials. Add example from recent project.',
         note: 'Draft - needs final review',
@@ -95,14 +113,14 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
 
       // February posts
       ScheduledPost(
-        id: '9',
+        id: 'lena_9',
         platform: 'Instagram',
         topic: 'Valentine\'s Day color palettes for the bedroom',
         date: DateTime(2026, 2, 2),
         time: '10:00',
       ),
       ScheduledPost(
-        id: '10',
+        id: 'lena_10',
         platform: 'LinkedIn',
         topic: 'Working with difficult clients: a designer\'s perspective',
         note: 'Keep professional tone',
@@ -110,14 +128,14 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '09:00',
       ),
       ScheduledPost(
-        id: '11',
+        id: 'lena_11',
         platform: 'Facebook',
         topic: 'Behind the scenes: kitchen renovation progress',
         date: DateTime(2026, 2, 9),
         time: '14:00',
       ),
       ScheduledPost(
-        id: '12',
+        id: 'lena_12',
         platform: 'Instagram',
         topic: 'Spring 2026 interior design trends',
         note: 'Include trending colors and textures',
@@ -125,21 +143,21 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '11:30',
       ),
       ScheduledPost(
-        id: '13',
+        id: 'lena_13',
         platform: 'Instagram',
         topic: 'Budget-friendly home office makeover tips',
         date: DateTime(2026, 2, 14),
         time: '15:00',
       ),
       ScheduledPost(
-        id: '14',
+        id: 'lena_14',
         platform: 'LinkedIn',
         topic: 'The ROI of good design for commercial spaces',
         date: DateTime(2026, 2, 16),
         time: '09:00',
       ),
       ScheduledPost(
-        id: '15',
+        id: 'lena_15',
         platform: 'Facebook',
         topic: 'Client spotlight and testimonial',
         note: 'Waiting for client approval',
@@ -147,11 +165,139 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '12:00',
       ),
       ScheduledPost(
-        id: '16',
+        id: 'lena_16',
         platform: 'Instagram',
         topic: 'Bathroom tile ideas: modern vs. classic',
         date: DateTime(2026, 2, 17),
         time: '16:00',
+      ),
+    ];
+  }
+
+  // Hard-coded mock data for Mike
+  List<ScheduledPost> _getMikeMockPosts() {
+    return [
+      // January posts
+      ScheduledPost(
+        id: 'mike_1',
+        platform: 'LinkedIn',
+        topic: 'Starting 2026 with sustainable architecture principles',
+        date: DateTime(2026, 1, 2),
+        time: '08:00',
+      ),
+      ScheduledPost(
+        id: 'mike_2',
+        platform: 'Instagram',
+        topic: 'Downtown loft transformation reveal',
+        note: 'Use aerial shots',
+        date: DateTime(2026, 1, 5),
+        time: '12:00',
+      ),
+      ScheduledPost(
+        id: 'mike_3',
+        platform: 'Facebook',
+        topic: 'Industrial meets minimalist: our latest project',
+        date: DateTime(2026, 1, 8),
+        time: '15:00',
+      ),
+      ScheduledPost(
+        id: 'mike_4',
+        platform: 'Instagram',
+        topic: 'How to choose the right lighting for open spaces',
+        date: DateTime(2026, 1, 12),
+        time: '11:00',
+      ),
+      ScheduledPost(
+        id: 'mike_5',
+        platform: 'LinkedIn',
+        topic: 'Collaborating with architects: lessons from 10 years',
+        note: 'Add project statistics',
+        date: DateTime(2026, 1, 15),
+        time: '09:30',
+      ),
+      ScheduledPost(
+        id: 'mike_6',
+        platform: 'Instagram',
+        topic: 'Texture study: concrete and wood combinations',
+        date: DateTime(2026, 1, 19),
+        time: '13:00',
+      ),
+      ScheduledPost(
+        id: 'mike_7',
+        platform: 'Facebook',
+        topic: 'Client success story: restaurant redesign',
+        note: 'Include before/after metrics',
+        date: DateTime(2026, 1, 23),
+        time: '14:30',
+      ),
+      ScheduledPost(
+        id: 'mike_8',
+        platform: 'LinkedIn',
+        topic: 'Commercial design trends to watch in 2026',
+        isDraft: true,
+        date: DateTime(2026, 1, 29),
+        time: '08:00',
+      ),
+
+      // February posts
+      ScheduledPost(
+        id: 'mike_9',
+        platform: 'Instagram',
+        topic: 'Office breakout spaces that actually work',
+        date: DateTime(2026, 2, 3),
+        time: '11:00',
+      ),
+      ScheduledPost(
+        id: 'mike_10',
+        platform: 'Facebook',
+        topic: 'Retail space design: creating customer flow',
+        note: 'Use diagrams',
+        date: DateTime(2026, 2, 6),
+        time: '13:00',
+      ),
+      ScheduledPost(
+        id: 'mike_11',
+        platform: 'LinkedIn',
+        topic: 'Biophilic design in corporate environments',
+        date: DateTime(2026, 2, 10),
+        time: '08:30',
+      ),
+      ScheduledPost(
+        id: 'mike_12',
+        platform: 'Instagram',
+        topic: 'Material Monday: reclaimed wood features',
+        date: DateTime(2026, 2, 13),
+        time: '12:00',
+      ),
+      ScheduledPost(
+        id: 'mike_13',
+        platform: 'Instagram',
+        topic: 'Acoustic solutions for open-plan offices',
+        note: 'Partner with acoustics company?',
+        date: DateTime(2026, 2, 15),
+        time: '14:00',
+      ),
+      ScheduledPost(
+        id: 'mike_14',
+        platform: 'LinkedIn',
+        topic: 'Building codes and design creativity: finding balance',
+        date: DateTime(2026, 2, 17),
+        time: '09:00',
+      ),
+      ScheduledPost(
+        id: 'mike_15',
+        platform: 'Facebook',
+        topic: 'Team spotlight: meet our design director',
+        date: DateTime(2026, 2, 17),
+        time: '15:00',
+      ),
+      ScheduledPost(
+        id: 'mike_16',
+        platform: 'Instagram',
+        topic: 'Studio tour: where the magic happens',
+        note: 'Record video walkthrough',
+        date: DateTime(2026, 2, 17),
+        time: '17:00',
       ),
     ];
   }
@@ -162,8 +308,13 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     // Fetch posts from backend
     final backendPosts = await _scheduleService.getAllScheduledPosts();
 
+    // Get user-specific mock data
+    final mockPosts = _personaId == 'mike'
+        ? _getMikeMockPosts()
+        : _getLenaMockPosts();
+
     // Combine mock data with backend posts
-    final allPosts = [..._getMockData(), ...backendPosts];
+    final allPosts = [...mockPosts, ...backendPosts];
 
     // Group posts by day for current month
     final Map<int, List<ScheduledPost>> groupedPosts = {};
