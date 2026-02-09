@@ -175,14 +175,13 @@ class _PostCreationChatScreenState extends State<PostCreationChatScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                color: colorScheme.onPrimary.withOpacity(0.9),  // White text with opacity
+                color: colorScheme.onPrimary.withOpacity(0.9),
               ),
             ),
           ],
         ),
-        backgroundColor: colorScheme.primary,  // Changed from onPrimaryContainer to primary (dark green)
-        foregroundColor: colorScheme.onPrimary,  // Added this for white text
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),  // Added this for white icons
+        backgroundColor: colorScheme.primary,
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
         actions: [
           Padding(

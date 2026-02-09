@@ -48,11 +48,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Account Overview Card
+
             _buildAccountOverview(context),
             const SizedBox(height: 16),
 
-            // Edit Personal Information
+
             _buildSectionCard(
               context,
               title: 'Personal Information',
@@ -83,11 +83,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Appearance Settings
+
             _buildAppearanceSection(context),
             const SizedBox(height: 16),
 
-            // Connected Platforms
+
             _buildSectionCard(
               context,
               title: 'Connected Platforms',
@@ -118,11 +118,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Subscription / Plan
+
             _buildSubscriptionCard(context),
             const SizedBox(height: 16),
 
-            // Help & Support
+
             _buildSectionCard(
               context,
               title: 'Help & Support',
@@ -153,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Legal & Compliance
+
             _buildSectionCard(
               context,
               title: 'Legal & Compliance',
@@ -181,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Logout Button
+
             _buildLogoutButton(context),
             const SizedBox(height: 20),
           ],
@@ -197,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          // Profile Picture
+
           Container(
             width: 70,
             height: 70,
@@ -227,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(width: 16),
 
-          // Name and Role
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
 
-          // Edit button
+
           IconButton(
             onPressed: () => _showEditDialog(context, 'Profile'),
             icon: const Icon(Icons.edit_outlined),
@@ -315,7 +315,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Theme Toggle
+
               InkWell(
                 onTap: () => themeService.toggleTheme(),
                 borderRadius: BorderRadius.circular(8),
@@ -581,7 +581,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Current Plan
+
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(

@@ -20,7 +20,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
   String _selectedOccasion = 'Product Launch';
   String _selectedPlatform = 'Instagram';
   final TextEditingController _descriptionController = TextEditingController();
-  List<XFile> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
 
   bool _isLoading = false;
 
@@ -49,7 +49,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
       backgroundColor: colorScheme.background,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.close, color: colorScheme.onPrimary),  // Explicitly set to white
+          icon: Icon(Icons.close, color: colorScheme.onPrimary),
           onPressed: () {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -60,7 +60,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
         title: const Text('Create New Post'),
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
-        iconTheme: IconThemeData(color: colorScheme.onPrimary),  // Also set iconTheme
+        iconTheme: IconThemeData(color: colorScheme.onPrimary),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -317,14 +317,14 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     );
   }
 
-  // NEW: Image upload section
+
   Widget _buildImageUploadSection() {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Upload buttons
+
         Row(
           children: [
             Expanded(
@@ -365,7 +365,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
           ],
         ),
 
-        // Display selected images
+
         if (_selectedImages.isNotEmpty) ...[
           const SizedBox(height: 16),
           Container(
@@ -431,7 +431,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: Colors.red,
                                     shape: BoxShape.circle,
                                   ),
@@ -457,7 +457,7 @@ class _PostQuestionnaireScreenState extends State<PostQuestionnaireScreen> {
     );
   }
 
-  // NEW: Pick images method
+
   Future<void> _pickImages(ImageSource source) async {
     try {
       if (source == ImageSource.gallery) {

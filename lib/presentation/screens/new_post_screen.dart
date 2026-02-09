@@ -8,7 +8,7 @@ class NewPostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Immediately navigate to questionnaire
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Navigator.pushReplacement(
         context,
@@ -18,7 +18,7 @@ class NewPostScreen extends StatelessWidget {
       );
     });
 
-    // Show loading while navigating
+
     return Scaffold(
       backgroundColor: colorScheme.background,
       body: Center(

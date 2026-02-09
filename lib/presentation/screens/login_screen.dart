@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,  // Changed to white
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -87,14 +87,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   'Social Media Assistant',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Colors.grey[700],  // Changed to grey for visibility on white
+                    color: Colors.grey[700],
                   ),
                 ),
                 const SizedBox(height: 48),
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],  // Light grey background for contrast
+                    color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: Colors.grey[300]!,
@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Text(
                   'Demo Accounts',
                   style: TextStyle(
-                    color: Colors.grey[800],  // Changed to dark grey for visibility
+                    color: Colors.grey[800],
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -181,8 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: OutlinedButton(
                         onPressed: () => _fillDemoAccount('lena@coco.com', 'password1'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,  // White text
-                          backgroundColor: AppColors.primarygreen,  // Green background
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primarygreen,
                           side: BorderSide(color: AppColors.primarygreen, width: 2),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -202,8 +202,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: OutlinedButton(
                         onPressed: () => _fillDemoAccount('mike@coco.com', 'password2'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,  // White text
-                          backgroundColor: AppColors.primarygreen,  // Green background
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primarygreen,
                           side: BorderSide(color: AppColors.primarygreen, width: 2),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(

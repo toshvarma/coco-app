@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppThemes {
-  // ---------------------------
-  // LIGHT THEME
-  // ---------------------------
+
+  // Light Mode
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -27,10 +26,10 @@ class AppThemes {
       shadow: Color(0xFF2F4538),
     ),
 
-    // Scaffold
+
     scaffoldBackgroundColor: const Color(0xFFF5F7F5),
 
-    // AppBar
+    // App Bar
     appBarTheme: const AppBarTheme(
       backgroundColor: Color(0xFFFFFFFF),
       foregroundColor: Color(0xFF2F4538),
@@ -39,7 +38,7 @@ class AppThemes {
       iconTheme: IconThemeData(color: Color(0xFF2F4538)),
     ),
 
-    // Bottom Navigation Bar
+    // Navigation Bar
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: const Color(0xFFFFFFFF),
       selectedItemColor: const Color(0xFF5A7D5C),
@@ -47,7 +46,6 @@ class AppThemes {
       elevation: 8,
     ),
 
-    // Card
     cardTheme: CardThemeData(
       color: const Color(0xFFFFFFFF),
       elevation: 0,
@@ -57,7 +55,6 @@ class AppThemes {
       ),
     ),
 
-    // Elevated Button
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF5A7D5C),
@@ -70,7 +67,6 @@ class AppThemes {
       ),
     ),
 
-    // Outlined Button
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: const Color(0xFF5A7D5C),
@@ -82,7 +78,7 @@ class AppThemes {
       ),
     ),
 
-    // Text Button
+
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: const Color(0xFF5A7D5C),
@@ -90,7 +86,7 @@ class AppThemes {
       ),
     ),
 
-    // Inputs
+
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: const Color(0xFFFFFFFF),
@@ -113,58 +109,53 @@ class AppThemes {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     ),
 
-    // Icons
+
     iconTheme: const IconThemeData(
       color: Color(0xFF5A7D5C),
     ),
 
-    // Dividers
+
     dividerTheme: const DividerThemeData(
       color: Color(0xFFD4E5D4),
       thickness: 1,
     ),
   );
 
-  // ---------------------------
-  // DARK THEME (IMPROVED CONTRAST - BRIGHTER TEXT)
-  // ---------------------------
+  // Dark Mode
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
 
     colorScheme: const ColorScheme.dark(
-      // Vibrant primary for interactive elements
+
       primary: Color(0xFFA8C9AA),
       primaryContainer: Color(0xFF5A7D5C),
 
-      // Secondary colors
+
       secondary: Color(0xFFB8D4A8),
       secondaryContainer: Color(0xFF3D5A3F),
 
-      // Dark surfaces
       surface: Color(0xFF1E2922),
       surfaceVariant: Color(0xFF2A3930),
       background: Color(0xFF141A16),
 
       error: Color(0xFFFF6B6B),
 
-      // MUCH BRIGHTER TEXT - almost white
+
       onPrimary: Color(0xFF1A2420),
-      onPrimaryContainer: Color(0xFFF5F7F5),  // Very light, almost white
-      onSecondary: Color(0xFF1A2420),
-      onSurface: Color(0xFFF5F7F5),  // Very light, almost white (main text color)
-      onBackground: Color(0xFFF5F7F5),  // Very light, almost white
+      onPrimaryContainer: Color(0xFFF5F7F5),
+      onSurface: Color(0xFFF5F7F5),
+      onBackground: Color(0xFFF5F7F5),
       onError: Color(0xFF1A2420),
 
-      // Visible borders
+
       outline: Color(0xFF5A7D5C),
       shadow: Color(0xFF000000),
     ),
 
-    // Scaffold
     scaffoldBackgroundColor: const Color(0xFF141A16),
 
-    // AppBar
+    // App Bar
     appBarTheme: const AppBarTheme(
       backgroundColor: Color(0xFF1E2922),
       foregroundColor: Color(0xFFF5F7F5),  // Bright text
@@ -173,7 +164,7 @@ class AppThemes {
       iconTheme: IconThemeData(color: Color(0xFFF5F7F5)),  // Bright icons
     ),
 
-    // Bottom Navigation Bar
+    // Navigation Bar
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: const Color(0xFF1E2922),
       selectedItemColor: const Color(0xFFA8C9AA),
@@ -181,7 +172,7 @@ class AppThemes {
       elevation: 8,
     ),
 
-    // Card
+
     cardTheme: CardThemeData(
       color: const Color(0xFF1E2922),
       elevation: 0,
@@ -191,7 +182,7 @@ class AppThemes {
       ),
     ),
 
-    // Elevated Button
+
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFA8C9AA),
@@ -204,7 +195,7 @@ class AppThemes {
       ),
     ),
 
-    // Outlined Button
+
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: const Color(0xFFA8C9AA),
@@ -216,7 +207,7 @@ class AppThemes {
       ),
     ),
 
-    // Text Button
+
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: const Color(0xFFA8C9AA),
@@ -224,7 +215,7 @@ class AppThemes {
       ),
     ),
 
-    // Inputs
+
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: const Color(0xFF1E2922),
@@ -247,12 +238,12 @@ class AppThemes {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     ),
 
-    // Icons
+
     iconTheme: const IconThemeData(
       color: Color(0xFFA8C9AA),
     ),
 
-    // Dividers
+
     dividerTheme: const DividerThemeData(
       color: Color(0xFF5A7D5C),
       thickness: 1,

@@ -12,7 +12,7 @@ class ThemeService extends ChangeNotifier {
     _loadThemeMode();
   }
 
-  // Load saved theme preference
+
   Future<void> _loadThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
     final savedTheme = prefs.getString(_themeKey);
@@ -23,21 +23,21 @@ class ThemeService extends ChangeNotifier {
     }
   }
 
-  // Toggle between light and dark mode
+
   Future<void> toggleTheme() async {
     _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     await _saveThemeMode();
     notifyListeners();
   }
 
-  // Set specific theme mode
+
   Future<void> setThemeMode(ThemeMode mode) async {
     _themeMode = mode;
     await _saveThemeMode();
     notifyListeners();
   }
 
-  // Save theme preference
+
   Future<void> _saveThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(

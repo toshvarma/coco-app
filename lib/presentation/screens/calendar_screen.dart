@@ -23,7 +23,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   String _personaId = 'lena';
 
   int currentYear = 2026;
-  int currentMonth = 2; // February
+  int currentMonth = 2;
 
   @override
   void initState() {
@@ -45,10 +45,10 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     _loadPosts();
   }
 
-  // Hard-coded mock data for Lena
+
   List<ScheduledPost> _getLenaMockPosts() {
     return [
-      // January posts
+
       ScheduledPost(
         id: 'lena_1',
         platform: 'Instagram',
@@ -111,7 +111,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '10:00',
       ),
 
-      // February posts
+
       ScheduledPost(
         id: 'lena_9',
         platform: 'Instagram',
@@ -174,10 +174,10 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     ];
   }
 
-  // Hard-coded mock data for Mike
+
   List<ScheduledPost> _getMikeMockPosts() {
     return [
-      // January posts
+
       ScheduledPost(
         id: 'mike_1',
         platform: 'LinkedIn',
@@ -239,7 +239,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         time: '08:00',
       ),
 
-      // February posts
+
       ScheduledPost(
         id: 'mike_9',
         platform: 'Instagram',
@@ -305,22 +305,21 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   Future<void> _loadPosts() async {
     setState(() => isLoading = true);
 
-    // Fetch posts from backend
+
     final backendPosts = await _scheduleService.getAllScheduledPosts();
 
-    // Get user-specific mock data
     final mockPosts = _personaId == 'mike'
         ? _getMikeMockPosts()
         : _getLenaMockPosts();
 
-    // Combine mock data with backend posts
+
     final allPosts = [...mockPosts, ...backendPosts];
 
-    // Group posts by day for current month
+
     final Map<int, List<ScheduledPost>> groupedPosts = {};
 
     for (var post in allPosts) {
-      // Only include posts from current month/year
+
       if (post.date.year == currentYear && post.date.month == currentMonth) {
         final day = post.date.day;
         if (!groupedPosts.containsKey(day)) {
@@ -354,7 +353,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Calendar',
               style: AppTextStyles.heading1,
             ),
@@ -515,12 +514,12 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
     List<Widget> weeks = [];
     List<int?> currentWeek = [];
 
-    // Add empty cells for days before the first day of month
+
     for (int i = 1; i < firstWeekday; i++) {
       currentWeek.add(null);
     }
 
-    // Add all days of the month
+
     for (int day = 1; day <= daysInMonth; day++) {
       currentWeek.add(day);
 
@@ -530,7 +529,7 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
       }
     }
 
-    // Fill last week with empty cells if needed
+
     while (currentWeek.length < 7 && currentWeek.isNotEmpty) {
       currentWeek.add(null);
     }
@@ -913,7 +912,6 @@ class _CalendarScreenWithNavbarState extends State<CalendarScreenWithNavbar> {
   }
 }
 
-// Calendar screen WITHOUT navbar
 class CalendarScreen extends StatelessWidget {
   const CalendarScreen({super.key});
 
@@ -930,7 +928,7 @@ class CalendarScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(
+        title: const Text(
           'Calendar',
           style: AppTextStyles.heading3,
         ),

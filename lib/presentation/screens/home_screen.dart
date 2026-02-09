@@ -77,9 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// ------------------------------------------------------
-// DASHBOARD SCREEN — WITH DYNAMIC USER NAME AND CALENDAR
-// ------------------------------------------------------
 
 class DashboardScreen extends StatefulWidget {
   final Function(int) onNavigate;
@@ -139,8 +136,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           post.date.day == now.day;
     }).toList()
       ..sort((a, b) {
-        // Sort by time string (format: "HH:mm")
-        // Handle null times by putting them at the end
+
         if (a.time == null && b.time == null) return 0;
         if (a.time == null) return 1;
         if (b.time == null) return -1;
@@ -154,11 +150,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return post.date.isAfter(now);
     }).toList()
       ..sort((a, b) {
-        // First sort by date, then by time
+
         final dateCompare = a.date.compareTo(b.date);
         if (dateCompare != 0) return dateCompare;
 
-        // Handle null times
+
         if (a.time == null && b.time == null) return 0;
         if (a.time == null) return 1;
         if (b.time == null) return -1;
@@ -249,7 +245,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Text('Your performance',
                         style: AppTextStyles.bodySmall
                             .copyWith(fontWeight: FontWeight.w600)),
-                    Text('past 7 days',
+                    const Text('past 7 days',
                         style: AppTextStyles.caption),
                   ],
                 ),
@@ -258,8 +254,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            children: const [
+          const Row(
+            children: [
               _StatItem(label: 'Posts', value: '12', icon: Icons.article),
               _DividerLine(),
               _StatItem(label: 'Reach', value: '3.5k', icon: Icons.visibility),
@@ -292,7 +288,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fontSize: 16,
                     )),
                 const SizedBox(height: 4),
-                Text(
+                const Text(
                   "You have been using COCO for 60 days now. Let's see your strengths and work on what could be better.",
                   style: AppTextStyles.caption,
                 ),
@@ -300,7 +296,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           _arrow(context, () {
-            // Get the review data for the current user
+
             final reviewData = ReviewService().getReviewForUser(_userName == 'Lena Hoffman' ? 'lena' : 'mike');
 
             Navigator.push(
@@ -328,7 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Text('Your Calendar',
                     style: AppTextStyles.heading3),
               ),
@@ -339,7 +335,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(dateFormat.format(now), style: AppTextStyles.caption),
           const SizedBox(height: 12),
 
-          // Loading state
+
           if (_isLoadingPosts)
             Center(
               child: Padding(
@@ -351,7 +347,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             )
 
-          // No posts scheduled
+
           else if (_scheduledPosts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -386,7 +382,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             )
 
-          // Show today's posts
+
           else ...[
               if (todayPosts.isNotEmpty) ...[
                 Text(
@@ -436,7 +432,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }),
               ],
 
-              // Show total count if more posts exist
+
               if (_scheduledPosts.length > 4) ...[
                 const SizedBox(height: 8),
                 Center(

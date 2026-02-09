@@ -25,22 +25,22 @@ class PostReadyScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: colorScheme.primary,  // Dark green background
-        foregroundColor: colorScheme.onPrimary,  // White text
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: colorScheme.onPrimary),  // White close icon
+          icon: Icon(Icons.close, color: colorScheme.onPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Your Post',
           style: TextStyle(
-            color: colorScheme.onPrimary,  // White text
+            color: colorScheme.onPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         iconTheme: IconThemeData(
-          color: colorScheme.onPrimary,  // White icons
+          color: colorScheme.onPrimary,
         ),
       ),
       body: SafeArea(
@@ -51,7 +51,7 @@ class PostReadyScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   children: [
-                    // Success Icon
+
                     Container(
                       width: 80,
                       height: 80,
@@ -90,7 +90,7 @@ class PostReadyScreen extends StatelessWidget {
 
                     const SizedBox(height: 32),
 
-                    // Template Image Preview
+
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
@@ -109,7 +109,7 @@ class PostReadyScreen extends StatelessWidget {
                           width: 300,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {
-                            // Fallback if image doesn't load
+
                             return Container(
                               width: 300,
                               height: 400,
@@ -143,7 +143,7 @@ class PostReadyScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    // Platform & Template Name Badge
+
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -178,7 +178,7 @@ class PostReadyScreen extends StatelessWidget {
               ),
             ),
 
-            // Bottom Action Buttons
+
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -194,7 +194,7 @@ class PostReadyScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Post Now Button
+
                   SizedBox(
                     width: double.infinity,
                     height: 54,
@@ -234,7 +234,7 @@ class PostReadyScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Schedule Button
+
                   SizedBox(
                     width: double.infinity,
                     height: 54,
@@ -260,7 +260,7 @@ class PostReadyScreen extends StatelessWidget {
 
                   const SizedBox(height: 12),
 
-                  // Back to Dashboard Button
+
                   TextButton.icon(
                     onPressed: () => _returnToDashboard(context),
                     icon: Icon(Icons.home, size: 18, color: Colors.grey[600]),
@@ -283,7 +283,7 @@ class PostReadyScreen extends StatelessWidget {
   }
 
   String _getTemplateImagePath(String platform, String templateName) {
-    // Map template names to image paths
+
     switch (platform.toLowerCase()) {
       case 'instagram':
         if (templateName.toLowerCase().contains('carousel')) {
@@ -365,7 +365,7 @@ class PostReadyScreen extends StatelessWidget {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Date Picker
+
                 InkWell(
                   onTap: () async {
                     final DateTime? picked = await showDatePicker(
@@ -421,7 +421,7 @@ class PostReadyScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // Time Picker
+
                 InkWell(
                   onTap: () async {
                     final TimeOfDay? picked = await showTimePicker(

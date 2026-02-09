@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/scheduled_post_model.dart';
 
 class ScheduleService {
+  // USE ONE OF THESE THREE PORTS TO RUN ON EMULATOR, WEB BROWSER, OR ANDROID DEVICE
   //static const String _baseUrl = 'http://10.0.2.2:3000/api/posts';
   //static const String _baseUrl = 'http://localhost:3000/api/posts';
   static const String _baseUrl = 'http://10.19.79.35:3000/api/posts';
@@ -13,7 +14,7 @@ class ScheduleService {
     return prefs.getString('userEmail') ?? '';
   }
 
-  // Schedule a post
+
   Future<bool> schedulePost(ScheduledPost post) async {
     try {
       final userEmail = await _getUserEmail();
@@ -38,7 +39,7 @@ class ScheduleService {
     }
   }
 
-  // Get all scheduled posts
+
   Future<List<ScheduledPost>> getAllScheduledPosts() async {
     try {
       final userEmail = await _getUserEmail();
@@ -61,7 +62,7 @@ class ScheduleService {
     }
   }
 
-  // Delete a post
+
   Future<bool> deletePost(String postId) async {
     try {
       final userEmail = await _getUserEmail();

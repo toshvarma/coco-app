@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
+  // USE ONE OF THESE THREE PORTS TO RUN ON EMULATOR, WEB BROWSER, OR ANDROID DEVICE
   //static const String _baseUrl = 'http://10.0.2.2:3000/api/auth';
   //static const String _baseUrl = 'http://localhost:3000/api/auth';
 static const String _baseUrl = 'http://10.19.79.35:3000/api/auth';
@@ -21,7 +22,6 @@ static const String _baseUrl = 'http://10.19.79.35:3000/api/auth';
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success']) {
-          // Save user info locally
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('userEmail', data['user']['email']);
           await prefs.setString('userName', data['user']['name']);

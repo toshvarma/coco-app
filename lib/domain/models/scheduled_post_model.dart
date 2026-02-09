@@ -17,7 +17,7 @@ class ScheduledPost {
     this.time,
   });
 
-  // Convert to JSON for storage
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -30,7 +30,7 @@ class ScheduledPost {
     };
   }
 
-  // Create from JSON
+
   factory ScheduledPost.fromJson(Map<String, dynamic> json) {
     return ScheduledPost(
       id: json['id'],
@@ -43,7 +43,7 @@ class ScheduledPost {
     );
   }
 
-  // Create a copy with modified fields
+
   ScheduledPost copyWith({
     String? id,
     String? platform,

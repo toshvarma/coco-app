@@ -176,7 +176,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          Text('Latest Post', style: AppTextStyles.bodySmall),
+          const Text('Latest Post', style: AppTextStyles.bodySmall),
           const SizedBox(height: 24),
           Text(
             _userStats['latestPostViews'] ?? '0',
@@ -203,7 +203,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Followers', style: AppTextStyles.heading3),
+          const Text('Followers', style: AppTextStyles.heading3),
           const SizedBox(height: 24),
           SizedBox(
             height: 200,
@@ -280,7 +280,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       child: CustomCard(
         child: Row(
           children: [
-            Expanded(
+            const Expanded(
               child: Text(
                 "Let's convert this to more value",
                 style: AppTextStyles.bodySmall,
@@ -294,7 +294,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 }
 
-// ================= LINE CHART PAINTER =================
+
 
 class LineChartPainter extends CustomPainter {
   final Color primaryColor;

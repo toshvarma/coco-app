@@ -211,18 +211,17 @@ Make each version unique and optimized for its specific format. Be creative and 
     return Scaffold(
       backgroundColor: colorScheme.background,
       appBar: AppBar(
-        backgroundColor: colorScheme.primary,  // Dark green background
-        foregroundColor: colorScheme.onPrimary,  // White text
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
         elevation: 0,
         title: Text(
           'Choose Your Template',
           style: TextStyle(
-            color: colorScheme.onPrimary,  // White text
-            fontWeight: FontWeight.bold,
+            color: colorScheme.onPrimary,
           ),
         ),
         iconTheme: IconThemeData(
-          color: colorScheme.onPrimary,  // White icons (back button)
+          color: colorScheme.onPrimary,
         ),
         actions: [
           if (!_isLoading && _generatedTemplates.isNotEmpty)
@@ -397,7 +396,7 @@ Make each version unique and optimized for its specific format. Be creative and 
 
           const SizedBox(height: 24),
 
-          // UPDATED: Container with actual template image
+
           Container(
             width: 280,
             decoration: BoxDecoration(
@@ -413,7 +412,7 @@ Make each version unique and optimized for its specific format. Be creative and 
             ),
             child: Column(
               children: [
-                // UPDATED: Template image from assets
+
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
@@ -425,7 +424,7 @@ Make each version unique and optimized for its specific format. Be creative and 
                     height: 400,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
-                      // Fallback if image doesn't load
+
                       return Container(
                         width: 280,
                         height: 400,
@@ -545,18 +544,18 @@ Make each version unique and optimized for its specific format. Be creative and 
   }
 }
 
-// Models
+
 class TemplateType {
   final String name;
   final String description;
   final IconData icon;
-  final String imagePath;  // ADDED: Image path field
+  final String imagePath;
 
   TemplateType({
     required this.name,
     required this.description,
     required this.icon,
-    required this.imagePath,  // ADDED: Required image path
+    required this.imagePath,
   });
 }
 

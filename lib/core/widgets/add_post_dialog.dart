@@ -68,7 +68,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+
                 Text(
                   widget.existingPost != null ? 'Edit Post' : 'Add New Post',
                   style: AppTextStyles.heading2,
@@ -80,7 +80,6 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 24),
 
-                // Platform Dropdown
                 Text(
                   'Platform',
                   style: AppTextStyles.bodySmall.copyWith(
@@ -113,7 +112,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Topic/Content
+
                 Text(
                   'Topic / Content',
                   style: AppTextStyles.bodySmall.copyWith(
@@ -140,7 +139,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Time
+
                 Text(
                   'Time (optional)',
                   style: AppTextStyles.bodySmall.copyWith(
@@ -163,7 +162,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Notes
+
                 Text(
                   'Notes (optional)',
                   style: AppTextStyles.bodySmall.copyWith(
@@ -184,7 +183,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Draft Checkbox
+
                 CheckboxListTile(
                   value: _isDraft,
                   onChanged: (value) {
@@ -192,7 +191,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                       _isDraft = value ?? false;
                     });
                   },
-                  title: Text(
+                  title: const Text(
                     'Save as draft',
                     style: AppTextStyles.bodySmall,
                   ),
@@ -202,7 +201,7 @@ class _AddPostDialogState extends State<AddPostDialog> {
                 ),
                 const SizedBox(height: 24),
 
-                // Buttons
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

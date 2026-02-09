@@ -5,13 +5,13 @@ import 'package:coco_app/domain/models/scheduled_post_model.dart';
 class PostStorageService {
   static const String _postsKey = 'scheduled_posts';
 
-  // Get all posts
+
   Future<List<ScheduledPost>> getAllPosts() async {
     final prefs = await SharedPreferences.getInstance();
     final String? postsJson = prefs.getString(_postsKey);
 
     if (postsJson == null) {
-      // Return mock data if no data exists (first time)
+
       return _getMockData();
     }
 
@@ -19,7 +19,7 @@ class PostStorageService {
     return decoded.map((item) => ScheduledPost.fromJson(item)).toList();
   }
 
-  // Get posts for a specific date
+
   Future<List<ScheduledPost>> getPostsForDate(DateTime date) async {
     final allPosts = await getAllPosts();
     return allPosts.where((post) {
@@ -29,7 +29,7 @@ class PostStorageService {
     }).toList();
   }
 
-  // Get posts for a specific month
+
   Future<Map<int, List<ScheduledPost>>> getPostsForMonth(int year, int month) async {
     final allPosts = await getAllPosts();
     final Map<int, List<ScheduledPost>> postsMap = {};
@@ -47,14 +47,14 @@ class PostStorageService {
     return postsMap;
   }
 
-  // Add a new post
+
   Future<void> addPost(ScheduledPost post) async {
     final allPosts = await getAllPosts();
     allPosts.add(post);
     await _savePosts(allPosts);
   }
 
-  // Update an existing post
+
   Future<void> updatePost(ScheduledPost post) async {
     final allPosts = await getAllPosts();
     final index = allPosts.indexWhere((p) => p.id == post.id);
@@ -65,21 +65,21 @@ class PostStorageService {
     }
   }
 
-  // Delete a post
+
   Future<void> deletePost(String postId) async {
     final allPosts = await getAllPosts();
     allPosts.removeWhere((post) => post.id == postId);
     await _savePosts(allPosts);
   }
 
-  // Save posts to storage
+
   Future<void> _savePosts(List<ScheduledPost> posts) async {
     final prefs = await SharedPreferences.getInstance();
     final String encoded = json.encode(posts.map((p) => p.toJson()).toList());
     await prefs.setString(_postsKey, encoded);
   }
 
-  // Mock data for initial load
+
   List<ScheduledPost> _getMockData() {
     return [
       ScheduledPost(
